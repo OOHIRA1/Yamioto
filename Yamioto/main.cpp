@@ -5,11 +5,12 @@ const int KEY_MAX = 256;
 int key[ KEY_MAX ];
 char key_c[ KEY_MAX ];
 
-const int TIME_LIMIT = 30;	//初期制限時間
+const int TIME_LIMIT = 11;	//初期制限時間	30
 const int CLEAR = 3;		//必要正解数
 const int QUESTION_MAX = 3;	//最大問題数
 
 int sound[ 10 ]; //音楽のハンドル
+int resource[ 10 ];	//画像のハンドル
 
 int flame_count = 0;
 int escape_count = 0;	//逃げているフレーム数を数える変数
@@ -20,7 +21,7 @@ int answer_count = -1;	//正解数
 bool answer = true;
 bool not_answer = false;
 bool input = true;
-
+bool sounded = false; 
 
 enum GameStatus {
 	GAME_START,
@@ -51,7 +52,15 @@ void load_sound( ) {
 	sound[ 1 ] = LoadSoundMem( "Sound/door.wav" );
 	sound[ 2 ] = LoadSoundMem( "Sound/playerAsioto.wav" );
 	sound[ 3 ] = LoadSoundMem( "Sound/gatyagatya.wav" );
+	sound[ 4 ] = LoadSoundMem( "Sound/seikai.wav" );
+	sound[ 5 ] = LoadSoundMem( "Sound/matigai.wav" );
+	sound[ 6 ] = LoadSoundMem( "Sound/clear.wav" );
+	sound[ 7 ] = LoadSoundMem( "Sound/gameover.wav" );
 } 
+
+void load_resource( ) {
+	resource[ 0 ] = LoadGraph( "Resource/gameover.png" );
+}
 
 
 void Initialization( ) {
@@ -63,6 +72,7 @@ void Initialization( ) {
 	answer = true;
 	not_answer = false;
 	input = true;
+	sounded = false;
 }
 
 
@@ -70,13 +80,16 @@ void Question( int num ) {
 
 	switch( num ) {
 	case 1 :
-		DrawFormatString( 100, 100, GetColor( 255, 255, 255 ), "1 + 1は？" );
-		DrawFormatString( 100, 120, GetColor( 255, 255, 255 ), "A：1 / B：2 / C：3 / D：4" );
 		if ( input == true ) {
+
+			DrawFormatString( 100, 100, GetColor( 255, 255, 255 ), "1 + 1は？" );
+			DrawFormatString( 100, 120, GetColor( 255, 255, 255 ), "A：1 / B：2 / C：3 / D：4" );
+
 			if ( key[ KEY_INPUT_B ] ) {
 				answer = true;
 				input = false;
 			}
+
 			if ( key[ KEY_INPUT_A ] || key[ KEY_INPUT_C ] || key[ KEY_INPUT_D ] ) {
 				not_answer = true;
 				input = false;
@@ -85,32 +98,40 @@ void Question( int num ) {
 		break;
 
 	case 2 :
-		DrawFormatString( 100, 100, GetColor( 255, 255, 255 ), "1 + 2は？" );
-		DrawFormatString( 100, 120, GetColor( 255, 255, 255 ), "A：1 / B：2 / C：3 / D：4" );
 		if ( input == true ) {
+
+			DrawFormatString( 100, 100, GetColor( 255, 255, 255 ), "1 + 2は？" );
+			DrawFormatString( 100, 120, GetColor( 255, 255, 255 ), "A：1 / B：2 / C：3 / D：4" );
+
 			if ( key[ KEY_INPUT_C ] ) {
 				answer = true;
 				input = false;
 			}
+
 			if ( key[ KEY_INPUT_A ] || key[ KEY_INPUT_B ] || key[ KEY_INPUT_D ] ) {
 				not_answer = true;
 				input = false;
 			}
+
 		}
 		break;
 
 	case 3 :
-		DrawFormatString( 100, 100, GetColor( 255, 255, 255 ), "1 + 3は？" );
-		DrawFormatString( 100, 120, GetColor( 255, 255, 255 ), "A：1 / B：2 / C：3 / D：4" );
 		if ( input == true ) {
+
+			DrawFormatString( 100, 100, GetColor( 255, 255, 255 ), "1 + 3は？" );
+			DrawFormatString( 100, 120, GetColor( 255, 255, 255 ), "A：1 / B：2 / C：3 / D：4" );
+
 			if ( key[ KEY_INPUT_D ] ) {
 				answer = true;
 				input = false;
 			}
+
 			if ( key[ KEY_INPUT_A ] || key[ KEY_INPUT_B ] || key[ KEY_INPUT_C ] ) {
 				not_answer = true;
 				input = false;
 			}
+
 		}
 		break;
 
@@ -165,7 +186,9 @@ void GameMain( ) {
 
 	//問題に答えたら
 	if ( not_answer ) {					//不正解処理
-
+		if ( escape_count == 0 ) {
+			PlaySoundMem( sound[ 5 ], DX_PLAYTYPE_BACK, TRUE );
+		}
 		escape_count++;
 		//answer = false;
 
@@ -181,20 +204,20 @@ void GameMain( ) {
 	}
 	
 	if ( answer ) {						//正解処理
-		//正解したら最初にドアを開ける
+		//正解したら最初に正解音を鳴らす。そのあとにドアの開閉音を鳴らす
 		if ( escape_count == 0 && answer_count > -1 ) {
-			PlaySoundMem( sound[ 1 ], DX_PLAYTYPE_NORMAL, TRUE );
+			PlaySoundMem( sound[ 4 ], DX_PLAYTYPE_NORMAL, TRUE );
+ 			PlaySoundMem( sound[ 1 ], DX_PLAYTYPE_NORMAL, TRUE );
 		}
 
-		//ドアを開け終わったら走り出す
-		if ( !CheckSoundMem( sound[ 1 ] ) ) {
+		//正解音とドアの開閉音が鳴り終わったら走り出す
 			if ( escape_count == 0 ) {
 				PlaySoundMem( sound[ 2 ], DX_PLAYTYPE_LOOP, TRUE );
 			}
 			escape_count++;											
 			//not_answer = false;
 			time += escape_count % 21 / 20;
-		}
+		
 
 		if ( escape_count == 200 ) {
 			StopSoundMem( sound[ 2 ] );
@@ -202,7 +225,7 @@ void GameMain( ) {
 			answer_count++;
 			
 			if ( answer_count < CLEAR ) {
-				PlaySoundMem( sound[ 3 ], DX_PLAYTYPE_NORMAL, TRUE );
+				PlaySoundMem( sound[ 3 ], DX_PLAYTYPE_NORMAL, TRUE ); //ガチャガチャ
 				question_num++;
 				input = true;
 				answer = false;
@@ -236,8 +259,20 @@ void GameResult( ) {
 	//描画
 	if ( answer_count == CLEAR ) {
 		DrawString(100, 100, "ゲームクリア！！！", GetColor( 255, 255, 255 ) );
+
+		if ( !sounded ) {
+			PlaySoundMem( sound[ 6 ], DX_PLAYTYPE_BACK, TRUE );
+			sounded = true;
+		}
+
 	} else {
 		DrawString(100, 100, "ゲームオーバー！！！", GetColor( 255, 0, 0 ) );
+		DrawGraph( 100, 110, resource[ 0 ], TRUE );
+		if ( !sounded ) {
+			PlaySoundMem( sound[ 7 ], DX_PLAYTYPE_BACK, TRUE );
+			sounded = true;
+		}
+
 	}
 
 	DrawString(100, 150, "PUSH SPACE", GetColor( 255, 255, 255 ) );
@@ -263,6 +298,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 
 	//初期化
 	load_sound( );
+	load_resource( );
 
 	while ( 1 ) {
 		if ( ScreenFlip( ) != 0 || ProcessMessage( ) != 0 || ClearDrawScreen( ) != 0 || updatekey( ) != 0) {
