@@ -160,6 +160,14 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Const.h" />
+    <ClInclude Include="GameManage.h" />
+    <ClInclude Include="Key.h" />
+    <ClInclude Include="Load.h" />
+    <ClInclude Include="Question.h" />
+    <ClInclude Include="Sound.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
