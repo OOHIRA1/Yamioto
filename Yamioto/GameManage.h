@@ -6,9 +6,10 @@
 enum GameStatus gamestatus = GAME_START;
 
 int flame_count = 0;
-int time = TIME_LIMIT - 10; //残り時間
+int time = TIME_LIMIT - 10; //残り時間 
 int escape_count = 0;	//逃げているフレーム数を数える変数
-int answer_count = -1;	//正解数
+int answer_count = -1;	//正解数	//最初にanswerをtureで処理するため-1で初期化
+int not_answer_count = 0; //不正解数
 bool sounded = false; 
 
 void Initialization( );
@@ -38,6 +39,7 @@ void Judge( ) {
 
 		if ( escape_count == 0 ) {
 			Psound( sound[5], BACK );
+			not_answer_count++;
 		}
 
 		escape_count++;
@@ -128,7 +130,17 @@ void GameMain( ) {
 	//時間を進める
 	flame_count++;
 	if ( !answer ) {
-		time -= flame_count % 61 / 60;
+		switch( not_answer_count ) {
+		case 0:
+			time -= flame_count % 61 / 60;
+			break;
+		case 1:
+			time -= flame_count % 46 / 45;
+			break;
+		default:
+			time -= flame_count % 31 / 30;
+			break;
+		}
 	}
 	
 	DrawFormatString( 0, 0, GetColor( 255, 0, 0 ), "%d", time );
