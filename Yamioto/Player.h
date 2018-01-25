@@ -9,10 +9,10 @@ struct Player {
 	int not_answer_count = 0; //•s³‰ð”
 };
 
-void PlayerInitialize( struct Player player ) {
-	player.position = VGet( 0, 0, 10 );
-	player.direction = VGet( 0, 0, 1 );
-	player.answer_count = -1;
-	player.not_answer_count = 0;
+void PlayerInitialize( struct Player *player ) {
+	player->position = VGet( 0, 0, 20 );
+	player->direction = VGet( 0, 0, 1 );
+	player->answer_count = -1;
+	player->not_answer_count = 0;
 
 }

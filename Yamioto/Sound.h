@@ -21,9 +21,6 @@ void Psound( int handol, int type ) {
 	}
 }
 
-void Vsound( int size, int handol ) {
-	ChangeVolumeSoundMem( size, handol );
-}
 
 void Ssound( int handol ) {
 	StopSoundMem( handol );

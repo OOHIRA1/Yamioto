@@ -6,6 +6,6 @@ struct Enemy {
 
 };
 
-void EnemyInitialize( struct Enemy enemy ) { 
-	enemy.position = VGet( 0, 0, 0 );
+void EnemyInitialize( struct Enemy *enemy ) { 
+	enemy->position = VGet( 0, 0, 0 );
 }

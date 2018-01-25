@@ -8,13 +8,13 @@
 enum GameStatus gamestatus = GAME_START;
 
 int flame_count = 0;
-int time = TIME_LIMIT - 10; //残り時間 
+int distance = FIRST_DISTANCE - 10; //残り時間 
 int escape_count = 0;	//逃げているフレーム数を数える変数
 bool sounded = false; 
 
 void Initialization( );
 void Judge( );
-void EnemySound( );
+
 
 void GameStart( );
 void GameMain( );
@@ -25,14 +25,14 @@ struct Enemy enemy;
 
 void Initialization( ) {
 
-	PlayerInitialize( player );
-	EnemyInitialize( enemy );
+	PlayerInitialize( &player );
+	EnemyInitialize( &enemy );
 	SetPlayerPosAndDir( player.position, VAdd( player.position, player.direction ) );
 	SetEnemySoundPos( enemy.position, sound[ 0 ] );
 	SetRadius( 30, sound[ 0 ] );
 
 	flame_count = 0;
-	time = TIME_LIMIT - 10;
+	distance = FIRST_DISTANCE - 10;
 	question_num = 0;
 	escape_count = 0;
 	answer = true;
@@ -76,7 +76,9 @@ void Judge( ) {
 		}
 
 		escape_count++;
-		time += escape_count % 21 / 20;
+		distance += escape_count % 21 / 20;
+		player.position.z += escape_count % 21 / 20;
+		SetPlayerPosAndDir( player.position, VAdd( player.position, player.direction ) );
 
 		if ( escape_count == 200 ) {
 			Ssound( sound[2] );
@@ -99,22 +101,12 @@ void Judge( ) {
 
 }
 
-void EnemySound( ) {
 
-	if ( time > 20 ) {
-		Vsound( 30, sound[0] );
-	}
-
-	if ( time < 20 && time > 10 ) {
-		Vsound( 50, sound[0] );
-	}
-
-	if ( time < 10 && time > 0 ) {
-		Vsound( 100, sound[0] );
-	}
-
-
+void draw( ) {
+	DrawBox( enemy.position.x - 8,  (480 - (enemy.position.z + 8 )), enemy.position.x + 8, (480 - ( enemy.position.z - 8 )), GetColor( 255, 0, 0 ), TRUE );
+	DrawBox( player.position.x - 8,  (480 - (player.position.z + 8 )), player.position.x + 8, (480 - ( player.position.z - 8 )), GetColor( 0, 0, 255 ), TRUE );
 }
+
 
 void GameStart( ) {
 
@@ -132,36 +124,41 @@ void GameMain( ) {
 
 	//初期足音
 	if ( Csound( sound[ 0 ] ) == 0 ) {
-		Vsound( 30, sound[0] );
 		Psound( sound[0], LOOP );
 	}
 
-	//時間を進める
+	//距離が縮まる
 	flame_count++;
 	if ( !answer ) {
 		switch( player.not_answer_count ) {
 		case 0:
-			time -= flame_count % 61 / 60;
+			distance -= flame_count % 61 / 60;
+			enemy.position.z += flame_count % 61 / 60;
 			break;
 		case 1:
-			time -= flame_count % 46 / 45;
+			distance -= flame_count % 46 / 45;
+			enemy.position.z += flame_count % 46 / 45;
 			break;
 		default:
-			time -= flame_count % 31 / 30;
+			distance -= flame_count % 31 / 30;
+			enemy.position.z += flame_count % 31 / 30;
 			break;
 		}
+		SetEnemySoundPos( enemy.position, sound[ 0 ] );
 	}
 	
-	DrawFormatString( 0, 0, GetColor( 255, 0, 0 ), "%d", time );
+
+
+	DrawFormatString( 0, 0, GetColor( 255, 0, 0 ), "%d", distance );
 
 	//時間経過で足音の音量を変える																	
-	EnemySound( );
+	//EnemySound( );
 
 	//問題に答えたら
 	Judge( );
 
 	//制限時間が０になったら
-	if ( time == 0 ) {
+	if ( distance == 0 ) {
 		gamestatus = GAME_RESULT;
 	}
 	
@@ -172,6 +169,7 @@ void GameMain( ) {
 	}
 
 	Question( question_num );
+	draw();
 }
 
 void GameResult( ) {
