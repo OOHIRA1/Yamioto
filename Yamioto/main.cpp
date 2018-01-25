@@ -10,6 +10,7 @@
 
 int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdshow ) {
 	ChangeWindowMode( 1 );
+	SetOneMeter( 1 );
 
 	if ( DxLib_Init( ) != 0 ) {
 		return -1;

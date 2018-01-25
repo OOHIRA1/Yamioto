@@ -2,14 +2,14 @@
 
 #include "Const.h"
 #include "Question.h"
+#include "Player.h"
+#include "Enemy.h"
 
 enum GameStatus gamestatus = GAME_START;
 
 int flame_count = 0;
 int time = TIME_LIMIT - 10; //残り時間 
 int escape_count = 0;	//逃げているフレーム数を数える変数
-int answer_count = -1;	//正解数	//最初にanswerをtureで処理するため-1で初期化
-int not_answer_count = 0; //不正解数
 bool sounded = false; 
 
 void Initialization( );
@@ -20,17 +20,26 @@ void GameStart( );
 void GameMain( );
 void GameResult( );
 
+struct Player player;
+struct Enemy enemy;
 
 void Initialization( ) {
+
+	PlayerInitialize( player );
+	EnemyInitialize( enemy );
+	SetPlayerPosAndDir( player.position, VAdd( player.position, player.direction ) );
+	SetEnemySoundPos( enemy.position, sound[ 0 ] );
+	SetRadius( 30, sound[ 0 ] );
+
 	flame_count = 0;
 	time = TIME_LIMIT - 10;
-	answer_count = -1;
 	question_num = 0;
 	escape_count = 0;
 	answer = true;
 	not_answer = false;
 	input = true;
 	sounded = false;
+
 }
 
 void Judge( ) {
@@ -39,7 +48,7 @@ void Judge( ) {
 
 		if ( escape_count == 0 ) {
 			Psound( sound[5], BACK );
-			not_answer_count++;
+			player.not_answer_count++;
 		}
 
 		escape_count++;
@@ -56,7 +65,7 @@ void Judge( ) {
 
 	if ( answer ) {						//正解処理
 										//正解したら最初に正解音を鳴らす。そのあとにドアの開閉音を鳴らす
-		if ( escape_count == 0 && answer_count > -1 ) {
+		if ( escape_count == 0 && player.answer_count > -1 ) {
 			Psound( sound[4], NORMAL );
 			Psound( sound[1], NORMAL );
 		}
@@ -72,9 +81,9 @@ void Judge( ) {
 		if ( escape_count == 200 ) {
 			Ssound( sound[2] );
 			escape_count = 0;
-			answer_count++;
+			player.answer_count++;
 
-			if ( answer_count < CLEAR ) {
+			if ( player.answer_count < CLEAR ) {
 				Psound( sound[3], NORMAL );
 				question_num++;
 
@@ -130,7 +139,7 @@ void GameMain( ) {
 	//時間を進める
 	flame_count++;
 	if ( !answer ) {
-		switch( not_answer_count ) {
+		switch( player.not_answer_count ) {
 		case 0:
 			time -= flame_count % 61 / 60;
 			break;
@@ -169,7 +178,7 @@ void GameResult( ) {
 	Ssound( sound[0] );
 
 	//描画
-	if ( answer_count == CLEAR ) {
+	if ( player.answer_count == CLEAR ) {
 		DrawString( 100, 100, "ゲームクリア！！！", GetColor( 255, 255, 255 ) );
 
 		if ( !sounded ) {

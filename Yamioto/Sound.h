@@ -32,3 +32,19 @@ void Ssound( int handol ) {
 int Csound( int handol ) {
 	return CheckSoundMem( handol );
 }
+
+void SetEnemySoundPos( VECTOR v, int handle ) {
+	Set3DPositionSoundMem( v, handle );
+}
+
+void SetPlayerPosAndDir( VECTOR listenerpos, VECTOR listenerdir ) {
+	Set3DSoundListenerPosAndFrontPos_UpVecY( listenerpos, VAdd( listenerpos, listenerdir ) );
+}
+
+void SetRadius( float radius, int handle ) { 
+	Set3DRadiusSoundMem( radius, handle );
+}
+
+void SetOneMeter( float distance ) {
+	Set3DSoundOneMetre( distance );
+}
