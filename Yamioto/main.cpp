@@ -10,8 +10,11 @@
 
 int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdshow ) {
 	ChangeWindowMode( 1 );
+	SetWindowText( "ˆÅ‰¹" );
 	SetOneMeter( 1 );
-
+	SetAlwaysRunFlag( TRUE );
+	SetWindowSize( 1280, 720 );
+	SetGraphMode( 1280, 720, 32 );
 	if ( DxLib_Init( ) != 0 ) {
 		return -1;
 	}
@@ -44,7 +47,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 			break;
 		}
 	}
-
+	InitSoundMem( );
 	DxLib_End( );
 	return 0;
 }

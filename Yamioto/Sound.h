@@ -30,6 +30,10 @@ int Csound( int handol ) {
 	return CheckSoundMem( handol );
 }
 
+void Vsound( int handol, int volume ) {
+	ChangeVolumeSoundMem( volume, handol );
+}
+
 void SetEnemySoundPos( VECTOR v, int handle ) {
 	Set3DPositionSoundMem( v, handle );
 }

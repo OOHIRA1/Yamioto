@@ -4,13 +4,23 @@
 #include "Question.h"
 #include "Player.h"
 #include "Enemy.h"
+#include <time.h>
 
 enum GameStatus gamestatus = GAME_START;
+int bright = 0;
+bool bright_max = true;
 
 int flame_count = 0;
 int distance = FIRST_DISTANCE - 10; //残り時間 
 int escape_count = 0;	//逃げているフレーム数を数える変数
 bool sounded = false; 
+int ExerciseBooks_num;
+
+
+int x1 = SCREEN_WIDTH_CENTER, y1 = SCREEN_HEIGHT_CENTER, 
+	x2 = SCREEN_WIDTH_CENTER, y2 = SCREEN_HEIGHT_CENTER, 
+	x3 = SCREEN_WIDTH_CENTER, y3 = SCREEN_HEIGHT_CENTER, 
+	x4 = SCREEN_WIDTH_CENTER, y4 = SCREEN_HEIGHT_CENTER;
 
 void Initialization( );
 void Judge( );
@@ -27,9 +37,10 @@ void Initialization( ) {
 
 	PlayerInitialize( &player );
 	EnemyInitialize( &enemy );
+	QuesitionInitialize( );
 	SetPlayerPosAndDir( player.position, VAdd( player.position, player.direction ) );
-	SetEnemySoundPos( enemy.position, sound[ 0 ] );
-	SetRadius( 30, sound[ 0 ] );
+	SetEnemySoundPos( enemy.position, sound[ ENEMY_VOICE ] );
+	SetRadius( 30, sound[ ENEMY_VOICE ] );
 
 	flame_count = 0;
 	distance = FIRST_DISTANCE - 10;
@@ -47,7 +58,7 @@ void Judge( ) {
 	if ( not_answer ) {	//不正解処理
 
 		if ( escape_count == 0 ) {
-			Psound( sound[5], BACK );
+			Psound( sound[ MATIGAI ], BACK );
 			player.not_answer_count++;
 		}
 
@@ -57,22 +68,24 @@ void Judge( ) {
 			escape_count = 0;
 			question_num++;
 
+			srand( time( NULL ) );
+			ExerciseBooks_num = rand( ) % 3;
+
 			input = true;
 			not_answer = false;
 		}
 
 	}
 
-	if ( answer ) {						//正解処理
-										//正解したら最初に正解音を鳴らす。そのあとにドアの開閉音を鳴らす
-		if ( escape_count == 0 && player.answer_count > -1 ) {
-			Psound( sound[4], NORMAL );
-			Psound( sound[1], NORMAL );
+	if ( answer ) {						//正解処理			
+		if ( escape_count == 0 && player.answer_count > -1 ) {			//正解したら最初に正解音を鳴らす。そのあとにドアの開閉音を鳴らす
+			Psound( sound[ SEIKAI ], NORMAL );
+			Psound( sound[ DOOR ], NORMAL );
 		}
 
 		//正解音とドアの開閉音が鳴り終わったら走り出す
 		if ( escape_count == 0 ) {
-			Psound( sound[2], LOOP );
+			Psound( sound[ PLAYER_ASIOTO ], LOOP );
 		}
 
 		escape_count++;
@@ -80,14 +93,23 @@ void Judge( ) {
 		player.position.z += escape_count % 21 / 20;
 		SetPlayerPosAndDir( player.position, VAdd( player.position, player.direction ) );
 
+		//脱出直前の画像表示
+		if ( player.answer_count == CLEAR - 1 ) {
+			DrawModiGraph( x1--, y1--, x2++, y2--, x3++, y3++, x4--, y4++, resource[ 1 ], TRUE );
+		}
+
+		
 		if ( escape_count == 200 ) {
-			Ssound( sound[2] );
+			Ssound( sound[ PLAYER_ASIOTO ] );
 			escape_count = 0;
 			player.answer_count++;
 
 			if ( player.answer_count < CLEAR ) {
-				Psound( sound[3], NORMAL );
+				Psound( sound[ DOOR_GATYA ], NORMAL );
 				question_num++;
+
+				srand( time( NULL ) );
+				ExerciseBooks_num = rand( ) % 3;
 
 				input = true;
 				answer = false;
@@ -102,18 +124,23 @@ void Judge( ) {
 }
 
 
-void draw( ) {
-	DrawBox( enemy.position.x - 8,  (480 - (enemy.position.z + 8 )), enemy.position.x + 8, (480 - ( enemy.position.z - 8 )), GetColor( 255, 0, 0 ), TRUE );
-	DrawBox( player.position.x - 8,  (480 - (player.position.z + 8 )), player.position.x + 8, (480 - ( player.position.z - 8 )), GetColor( 0, 0, 255 ), TRUE );
+void debugdraw( ) {
+	DrawBoxAA( enemy.position.x - 8,  (480 - (enemy.position.z + 8 )), enemy.position.x + 8, (480 - ( enemy.position.z - 8 )), GetColor( 255, 255, 255 ), TRUE );
+	DrawBoxAA( player.position.x - 8,  (480 - (player.position.z + 8 )), player.position.x + 8, (480 - ( player.position.z - 8 )), GetColor( 0, 0, 255 ), TRUE );
 }
 
 
 void GameStart( ) {
+	//スタート画面ＢＧＭ
+	if ( !Csound( sound[ GAME_START_BGM ] ) ) {
+		Psound( sound[ GAME_START_BGM ], LOOP );
+	}
 
 	//表示
 	DrawString(100, 100, "闇音", GetColor( 255, 255, 255 ) );
-	DrawString(100, 150, "PUSH ENTER", GetColor( 255, 255, 255 ) );
+	DrawString(100, 150, "PRESS ENTER KEY", GetColor( 255, 255, 255 ) );
 	if ( key[ KEY_INPUT_RETURN ] ) {
+		Ssound( sound[ GAME_START_BGM ] );
 		gamestatus = GAME_MAIN;
 		Initialization( );
 	}
@@ -121,10 +148,16 @@ void GameStart( ) {
 }
 
 void GameMain( ) {
+	//ゲームメインＢＧＭ
+	if ( !Csound( sound[ GAME_MAIN_BGM ] ) ) {
+		Psound( sound[ GAME_MAIN_BGM ], LOOP );
+		Vsound( sound[ GAME_MAIN_BGM ], 100 );
+	}
 
-	//初期足音
-	if ( Csound( sound[ 0 ] ) == 0 ) {
-		Psound( sound[0], LOOP );
+	//初期歌声
+	if ( !Csound( sound[ ENEMY_VOICE ] ) ) {
+		Psound( sound[ ENEMY_VOICE ], LOOP );
+		Vsound( sound[ ENEMY_VOICE ], 255 );
 	}
 
 	//距離が縮まる
@@ -144,15 +177,55 @@ void GameMain( ) {
 			enemy.position.z += flame_count % 31 / 30;
 			break;
 		}
-		SetEnemySoundPos( enemy.position, sound[ 0 ] );
+		SetEnemySoundPos( enemy.position, sound[ ENEMY_VOICE ] );
 	}
+
+
+	//時間に合わせて画面を赤くしていく
+	int r = bright;
+	int g = bright;
+	int b = bright;
+
+	if ( distance > 30 ) {
+
+		if ( bright > 0 ) bright--;
+		
+	} else if ( distance > 20 && distance <= 30 ) {
+
+		if ( bright > 100 ) {
+			bright--;
+		} else {
+			bright++;
+		}
 	
+	} else if ( distance > 10 && distance <= 20 ) {
 
+		if ( bright < 255 ) bright++;
 
-	DrawFormatString( 0, 0, GetColor( 255, 0, 0 ), "%d", distance );
+	} else {
+		
+		if ( bright > 255  ) {
+			bright_max = true;
+		} else if ( bright < 0 ) {
+			bright_max = false;
+		} 
 
-	//時間経過で足音の音量を変える																	
-	//EnemySound( );
+		if ( !bright_max ) {
+			bright += 5;
+		} else {
+			bright -= 5;
+		}
+
+	}
+
+	//画面を赤くするやつ描画
+	SetDrawBright( r, g, b );
+	DrawGraph( 0, 0, resource[ 3 ], TRUE );
+	SetDrawBright( 255, 255, 255 );
+
+	//残り距離を描画
+	DrawFormatString( 0, 0, GetColor( 255, 255, 255 ), "%d", distance );
+																
 
 	//問題に答えたら
 	Judge( );
@@ -168,19 +241,20 @@ void GameMain( ) {
 		question_num = 1;
 	}
 
-	Question( question_num );
-	draw();
+	Question( ExerciseBooks_num, question_num );
+	debugdraw();
 }
 
 void GameResult( ) {
-	Ssound( sound[0] );
+	Ssound( sound[ GAME_MAIN_BGM ] );
+	Ssound( sound[ ENEMY_VOICE ] );
 
 	//描画
 	if ( player.answer_count == CLEAR ) {
 		DrawString( 100, 100, "ゲームクリア！！！", GetColor( 255, 255, 255 ) );
-
+		DrawGraph( 100,110, resource[ 2 ], TRUE );
 		if ( !sounded ) {
-			Psound( sound[6], BACK );
+			Psound( sound[ GAME_CLEAR ], BACK );
 			sounded = true;
 		}
 
@@ -189,7 +263,7 @@ void GameResult( ) {
 		DrawGraph( 100, 110, resource[ 0 ], TRUE );
 
 		if ( !sounded ) {
-			Psound( sound[7], BACK );
+			Psound( sound[ GAME_OVER ], BACK );
 			sounded = true;
 		}
 

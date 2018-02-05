@@ -2,24 +2,28 @@
 
 #include "Dxlib.h"
 
-int sound[ 10 ]; //音楽のハンドル
+int sound[ 20 ]; //音楽のハンドル
 int resource[ 10 ];	//画像のハンドル
 
 void load_sound( ) {
 	SetCreate3DSoundFlag( TRUE );
-	sound[ 0 ] = LoadSoundMem( "Sound/asioto.wav" );
+	sound[ ENEMY_VOICE ] = LoadSoundMem( "Sound/EnemyVoice.wav" );
 	SetCreate3DSoundFlag( FALSE );
 
-	sound[ 1 ] = LoadSoundMem( "Sound/door.wav" );
-	sound[ 2 ] = LoadSoundMem( "Sound/playerAsioto.wav" );
-	sound[ 3 ] = LoadSoundMem( "Sound/gatyagatya.wav" );
-	sound[ 4 ] = LoadSoundMem( "Sound/seikai.wav" );
-	sound[ 5 ] = LoadSoundMem( "Sound/matigai.wav" );
-	sound[ 6 ] = LoadSoundMem( "Sound/clear.wav" );
-	sound[ 7 ] = LoadSoundMem( "Sound/gameover.wav" );
+	sound[ PLAYER_ASIOTO  ] = LoadSoundMem( "Sound/PlayerAsioto.wav" );
+	sound[ DOOR           ] = LoadSoundMem( "Sound/Door.wav" );
+	sound[ DOOR_GATYA     ] = LoadSoundMem( "Sound/GatyaGatya.wav" );
+	sound[ SEIKAI         ] = LoadSoundMem( "Sound/Seikai.wav" );
+	sound[ MATIGAI        ] = LoadSoundMem( "Sound/Matigai.wav" );
+	sound[ GAME_CLEAR     ] = LoadSoundMem( "Sound/GameClear.wav" );
+	sound[ GAME_OVER      ] = LoadSoundMem( "Sound/GameOver.wav" );
+	sound[ GAME_START_BGM ] = LoadSoundMem( "Sound/GameStart.wav" );
+	sound[ GAME_MAIN_BGM  ] = LoadSoundMem( "Sound/GameMain.wav" );
 } 
 
 void load_resource( ) {
 	resource[ 0 ] = LoadGraph( "Resource/gameover.png" );
+	resource[ 1 ] = LoadGraph( "Resource/hikari.png" );
+	resource[ 2 ] = LoadGraph( "Resource/gameclear.png" );
+	resource[ 3 ] = LoadGraph( "Resource/aka.png" );
 }
-
