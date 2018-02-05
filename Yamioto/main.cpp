@@ -12,9 +12,9 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 	ChangeWindowMode( 1 );
 	SetWindowText( "闇音" );
 	SetOneMeter( 1 );
-	SetAlwaysRunFlag( TRUE );
+	SetAlwaysRunFlag( TRUE );	//別のウィンドウに切り替えても処理が継続される関数
 	SetWindowSize( 1280, 720 );
-	SetGraphMode( 1280, 720, 32 );
+	SetGraphMode( 1280, 720, 32 );	//画像の解像度を設定する関数
 	if ( DxLib_Init( ) != 0 ) {
 		return -1;
 	}
@@ -47,7 +47,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 			break;
 		}
 	}
-	InitSoundMem( );
+	//InitSoundMem( );
 	DxLib_End( );
 	return 0;
 }

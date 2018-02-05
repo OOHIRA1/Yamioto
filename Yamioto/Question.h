@@ -2,7 +2,6 @@
 
 #include "DxLib.h"
 #include "Key.h"
-#include <Windows.h>
 
 int question_num = 0;	//–â‘è”Ô†
 bool answer = true;
