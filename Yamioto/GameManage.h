@@ -41,6 +41,8 @@ void Initialization( ) {
 	SetPlayerPosAndDir( player.position, VAdd( player.position, player.direction ) );
 	SetEnemySoundPos( enemy.position, sound[ ENEMY_VOICE ] );
 	SetRadius( 30, sound[ ENEMY_VOICE ] );
+	SetPlayerVelocity( player.velocity );
+	SetEnemyVelocity( enemy.velocity, sound[ ENEMY_VOICE ] );
 
 	flame_count = 0;
 	distance = FIRST_DISTANCE - 10;

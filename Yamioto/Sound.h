@@ -2,18 +2,18 @@
 
 #include "DxLib.h"
 
-void Psound( int handol, int type ) {
+void Psound( int handle, int type ) {
 	switch ( type ) {
 	case 0:
-		PlaySoundMem( handol, DX_PLAYTYPE_NORMAL, TRUE );
+		PlaySoundMem( handle, DX_PLAYTYPE_NORMAL, TRUE );
 		break;
 
 	case 1:
-		PlaySoundMem( handol, DX_PLAYTYPE_BACK, TRUE );
+		PlaySoundMem( handle, DX_PLAYTYPE_BACK, TRUE );
 		break;
 
 	case 2:
-		PlaySoundMem( handol, DX_PLAYTYPE_LOOP, TRUE );
+		PlaySoundMem( handle, DX_PLAYTYPE_LOOP, TRUE );
 		break;
 
 	default:
@@ -22,16 +22,16 @@ void Psound( int handol, int type ) {
 }
 
 
-void Ssound( int handol ) {
-	StopSoundMem( handol );
+void Ssound( int handle ) {
+	StopSoundMem( handle );
 }
 
-int Csound( int handol ) {
-	return CheckSoundMem( handol );
+int Csound( int handle ) {
+	return CheckSoundMem( handle );
 }
 
-void Vsound( int handol, int volume ) {
-	ChangeVolumeSoundMem( volume, handol );
+void Vsound( int handle, int volume ) {
+	ChangeVolumeSoundMem( volume, handle );
 }
 
 void SetEnemySoundPos( VECTOR v, int handle ) {
@@ -48,4 +48,12 @@ void SetRadius( float radius, int handle ) {
 
 void SetOneMeter( float distance ) {
 	Set3DSoundOneMetre( distance );
+}
+
+void SetPlayerVelocity( VECTOR velocity ) {
+	Set3DSoundListenerVelocity( velocity );
+}
+
+void SetEnemyVelocity( VECTOR velocity, int handle ) {
+	Set3DVelocitySoundMem( velocity, handle );
 }

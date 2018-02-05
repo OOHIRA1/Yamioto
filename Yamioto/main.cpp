@@ -15,6 +15,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 	SetAlwaysRunFlag( TRUE );	//別のウィンドウに切り替えても処理が継続される関数
 	SetWindowSize( 1280, 720 );
 	SetGraphMode( 1280, 720, 32 );	//画像の解像度を設定する関数
+	SetEnableXAudioFlag( TRUE );	//サウンドの再生にXAudio2を使用するかどうかを設定する
 	if ( DxLib_Init( ) != 0 ) {
 		return -1;
 	}
