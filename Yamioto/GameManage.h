@@ -62,11 +62,24 @@ void Judge( ) {
 		if ( escape_count == 0 ) {
 			Psound( sound[ MATIGAI ], BACK );
 			player.not_answer_count++;
+
+			switch( player.not_answer_count ) {
+			case 1:
+				enemy.velocity = VGet( 0, 0, 1.5 );
+				SetEnemyVelocity( enemy.velocity, sound[ ENEMY_VOICE ] );
+				break;
+			default:
+				enemy.velocity = VGet( 0, 0, 2 );
+				SetEnemyVelocity( enemy.velocity, sound[ ENEMY_VOICE ] );
+				break;
+			}
+
 		}
 
 		escape_count++;
 
 		if ( escape_count == 200 ) {
+
 			escape_count = 0;
 			question_num++;
 
@@ -79,6 +92,8 @@ void Judge( ) {
 
 	}
 
+
+
 	if ( answer ) {						//正解処理			
 		if ( escape_count == 0 && player.answer_count > -1 ) {			//正解したら最初に正解音を鳴らす。そのあとにドアの開閉音を鳴らす
 			Psound( sound[ SEIKAI ], NORMAL );
@@ -88,13 +103,15 @@ void Judge( ) {
 		//正解音とドアの開閉音が鳴り終わったら走り出す
 		if ( escape_count == 0 ) {
 			Psound( sound[ PLAYER_ASIOTO ], LOOP );
+			player.velocity = VGet( 0, 0, 3 );
+			SetPlayerVelocity( player.velocity );
 		}
 
 		escape_count++;
 		distance += escape_count % 21 / 20;
 		player.position.z += escape_count % 21 / 20;
 		SetPlayerPosAndDir( player.position, VAdd( player.position, player.direction ) );
-
+		
 		//脱出直前の画像表示
 		if ( player.answer_count == CLEAR - 1 ) {
 			DrawModiGraph( x1--, y1--, x2++, y2--, x3++, y3++, x4--, y4++, resource[ 1 ], TRUE );
@@ -102,6 +119,7 @@ void Judge( ) {
 
 		
 		if ( escape_count == 200 ) {
+			player.velocity = VGet( 0, 0, 0 ); 
 			Ssound( sound[ PLAYER_ASIOTO ] );
 			escape_count = 0;
 			player.answer_count++;
@@ -160,6 +178,8 @@ void GameMain( ) {
 	if ( !Csound( sound[ ENEMY_VOICE ] ) ) {
 		Psound( sound[ ENEMY_VOICE ], LOOP );
 		Vsound( sound[ ENEMY_VOICE ], 255 );
+		enemy.velocity = VGet( 0, 0, 1 );
+		SetEnemyVelocity( enemy.velocity, sound[ ENEMY_VOICE ] );
 	}
 
 	//距離が縮まる
@@ -243,7 +263,7 @@ void GameMain( ) {
 		question_num = 1;
 	}
 
-	Question( ExerciseBooks_num, question_num );
+	Question( /*ExerciseBooks_num*/1, question_num );
 	debugdraw();
 }
 
