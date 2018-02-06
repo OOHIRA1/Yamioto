@@ -124,14 +124,23 @@ void Judge( ) {
 			Vsound( sound[ PLAYER_ASIOTO ], 100 );
 			Psound( sound[ PLAYER_ASIOTO ], LOOP );
 			player.velocity = VGet( 0, 0, 3*5 );
-			enemy.velocity = VGet( 0, 0, -3*5 );
+			if ( player.answer_count > -1 ) {	
+				enemy.velocity = VGet( 0, 0, -3*5 );
+			}
 			SetPlayerVelocity( player.velocity );
 		}
 
 			
 		escape_count++;
-		distance += escape_count % 21 / 20;
+		if ( player.answer_count > -1 ) {	
+			distance += escape_count % 11 / 10;
+		} else {
+			distance += escape_count % 21 / 20;
+		}
 		player.position.z += escape_count % 21 / 20;
+		if ( player.answer_count > -1 ) {	
+			enemy.position.z -= escape_count % 21 / 20;
+		}
 		SetPlayerPosAndDir( player.position, VAdd( player.position, player.direction ) );
 		
 		//íEèoíºëOÇÃâÊëúï\é¶
@@ -141,7 +150,19 @@ void Judge( ) {
 
 		
 		if ( escape_count == 200 ) {
-			enemy.velocity = VGet( 0, 0, 1 );
+			switch( player.not_answer_count ) {
+			case 0:
+				enemy.velocity = VGet( 0, 0, 1 );
+				SetEnemyVelocity( enemy.velocity, sound[ ENEMY_VOICE ] );
+			case 1:
+				enemy.velocity = VGet( 0, 0, 1.5 );
+				SetEnemyVelocity( enemy.velocity, sound[ ENEMY_VOICE ] );
+				break;
+			default:
+				enemy.velocity = VGet( 0, 0, 2 );
+				SetEnemyVelocity( enemy.velocity, sound[ ENEMY_VOICE ] );
+				break;
+			}
 			player.velocity = VGet( 0, 0, 0 ); 
 			Ssound( sound[ PLAYER_ASIOTO ] );
 			escape_count = 0;
