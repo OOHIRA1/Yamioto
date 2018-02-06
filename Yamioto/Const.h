@@ -37,3 +37,9 @@ enum Sound{
 	GAME_START_BGM,
 	GAME_MAIN_BGM
 };
+
+enum Way {
+	STRAIGHT_WAY,
+	RIGHT_WAY,
+	LEFT_WAY
+};

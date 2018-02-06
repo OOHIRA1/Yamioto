@@ -7,6 +7,8 @@
 #include <time.h>
 
 enum GameStatus gamestatus = GAME_START;
+enum Way way = STRAIGHT_WAY;
+
 int bright = 0;
 bool bright_max = true;
 
@@ -17,6 +19,7 @@ bool sounded = false;
 int ExerciseBooks_num;
 int gameoverWait_count = 0;
 bool gameover_wait = true;
+bool input2 = true;
 
 
 int x1 = SCREEN_WIDTH_CENTER, y1 = SCREEN_HEIGHT_CENTER, 
@@ -68,7 +71,38 @@ void Initialization( ) {
 	sounded = false;
 	gameover_wait = true;
 
+
 }
+
+void chooseWay( ) {
+	if ( input2 ) {
+		if ( key[ KEY_INPUT_Z ] ) { 
+			way = STRAIGHT_WAY; 
+			input2 = false;
+		}
+		else if ( key[ KEY_INPUT_X ] ) {
+			way = RIGHT_WAY;
+			input2 = false;
+		}
+		else if ( key[ KEY_INPUT_V ] ) { 
+			way = LEFT_WAY;
+			input2 = false;
+		}
+	}
+
+	if ( !input2 ) {
+		if ( way = STRAIGHT_WAY ) {
+			//^‚ñ’†‚Ì“¹‚Ì‚Æ‚«
+		} else if ( way = RIGHT_WAY ) {
+			//‰E‚Ì“¹‚Ì‚Æ‚«
+		} else if ( way = LEFT_WAY ) {
+			//¶‚Ì“¹‚Ì‚Æ‚«
+		}
+	}
+
+
+}
+
 
 void Judge( ) {
 
@@ -137,6 +171,7 @@ void Judge( ) {
 		} else {
 			distance += escape_count % 21 / 20;
 		}
+
 		player.position.z += escape_count % 21 / 20;
 		if ( player.answer_count > -1 ) {	
 			enemy.position.z -= escape_count % 21 / 20;
