@@ -90,13 +90,13 @@
       <PreprocessorDefinitions>
       </PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Users\student\Desktop\Yamioto_GitHub\Yamioto\DxLib;C:\Users\student\Desktop\yamioto\DxLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\student\Desktop\Yamioto_GitHub\Yamioto\DxLib;C:\Users\s5f0w\Desktop\Yamioto_GitHub1\Yamioto\DxLib;C:\Users\student\Desktop\yamioto\DxLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\student\Desktop\Yamioto_GitHub\Yamioto\DxLib;C:\Users\student\Desktop\yamioto\DxLib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Users\s5f0w\Desktop\Yamioto_GitHub1\Yamioto\DxLib;C:\Users\student\Desktop\Yamioto_GitHub\Yamioto\DxLib;C:\Users\student\Desktop\yamioto\DxLib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -108,13 +108,13 @@
       <PreprocessorDefinitions>
       </PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Users\student\Desktop\Yamioto_GitHub\Yamioto\DxLib;C:\Users\student\Desktop\Yamioto\Yamioto\DxLib;C:\Users\student\Desktop\闇音\DxLib;C:\Users\student\Desktop\yamioto\DxLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\student\Desktop\Yamioto_GitHub\Yamioto\DxLib;C:\Users\s5f0w\Desktop\Yamioto_GitHub1\Yamioto\DxLib;C:\Users\student\Desktop\Yamioto\Yamioto\DxLib;C:\Users\student\Desktop\闇音\DxLib;C:\Users\student\Desktop\yamioto\DxLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\student\Desktop\Yamioto_GitHub\Yamioto\DxLib;C:\Users\student\Desktop\Yamioto\Yamioto\DxLib;C:\Users\student\Desktop\闇音\DxLib;C:\Users\student\Desktop\yamioto\DxLib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Users\s5f0w\Desktop\Yamioto_GitHub1\Yamioto\DxLib;C:\Users\student\Desktop\Yamioto_GitHub\Yamioto\DxLib;C:\Users\student\Desktop\Yamioto\Yamioto\DxLib;C:\Users\student\Desktop\闇音\DxLib;C:\Users\student\Desktop\yamioto\DxLib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -128,7 +128,7 @@
       <PreprocessorDefinitions>
       </PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Users\student\Desktop\Yamioto_GitHub\Yamioto\DxLib;C:\Users\student\Desktop\yamioto\DxLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\student\Desktop\Yamioto_GitHub\Yamioto\DxLib;C:\Users\s5f0w\Desktop\Yamioto_GitHub1\Yamioto\DxLib;C:\Users\student\Desktop\yamioto\DxLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -136,7 +136,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\student\Desktop\Yamioto_GitHub\Yamioto\DxLib;C:\Users\student\Desktop\yamioto\DxLib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Users\s5f0w\Desktop\Yamioto_GitHub1\Yamioto\DxLib;C:\Users\student\Desktop\Yamioto_GitHub\Yamioto\DxLib;C:\Users\student\Desktop\yamioto\DxLib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -150,7 +150,7 @@
       <PreprocessorDefinitions>
       </PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Users\student\Desktop\Yamioto_GitHub\Yamioto\DxLib;C:\Users\student\Desktop\Yamioto\Yamioto\DxLib;C:\Users\student\Desktop\闇音\DxLib;C:\Users\student\Desktop\yamioto\DxLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\student\Desktop\Yamioto_GitHub\Yamioto\DxLib;C:\Users\s5f0w\Desktop\Yamioto_GitHub1\Yamioto\DxLib;C:\Users\student\Desktop\Yamioto\Yamioto\DxLib;C:\Users\student\Desktop\闇音\DxLib;C:\Users\student\Desktop\yamioto\DxLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -158,7 +158,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\student\Desktop\Yamioto_GitHub\Yamioto\DxLib;C:\Users\student\Desktop\Yamioto\Yamioto\DxLib;C:\Users\student\Desktop\闇音\DxLib;C:\Users\student\Desktop\yamioto\DxLib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Users\s5f0w\Desktop\Yamioto_GitHub1\Yamioto\DxLib;C:\Users\student\Desktop\Yamioto_GitHub\Yamioto\DxLib;C:\Users\student\Desktop\Yamioto\Yamioto\DxLib;C:\Users\student\Desktop\闇音\DxLib;C:\Users\student\Desktop\yamioto\DxLib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

@@ -120,6 +120,7 @@ void Judge( ) {
 		if ( escape_count == 0 ) {
 			//Psound( sound[ PLAYER_ASIOTO ], LOOP );
 			player.velocity = VGet( 0, 0, 3*5 );
+			SetPlayerVelocity( player.velocity );
 		}
 
 			
@@ -279,7 +280,7 @@ void GameMain( ) {
 		question_num = 1;
 	}
 
-	Question( ExerciseBooks_num, question_num );
+	Question( /*ExerciseBooks_num*/1, question_num );
 	debugdraw();
 	SetPlayerVelocity( player.velocity );
 }
