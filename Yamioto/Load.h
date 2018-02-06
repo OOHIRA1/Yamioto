@@ -8,9 +8,10 @@ int resource[ 10 ];	//‰æ‘œ‚Ìƒnƒ“ƒhƒ‹
 void load_sound( ) {
 	SetCreate3DSoundFlag( TRUE );
 	sound[ ENEMY_VOICE ] = LoadSoundMem( "Sound/EnemyVoice.wav" );
+	//sound[ ENEMY_VOICE ] = LoadSoundMem( "Sound/PlayerAsioto.wav" );
 	SetCreate3DSoundFlag( FALSE );
 
-	sound[ PLAYER_ASIOTO  ] = LoadSoundMem( "Sound/PlayerAsioto.wav" );
+	sound[ PLAYER_ASIOTO  ] = LoadSoundMem( "Sound/asioto.wav" );
 	sound[ DOOR           ] = LoadSoundMem( "Sound/Door.wav" );
 	sound[ DOOR_GATYA     ] = LoadSoundMem( "Sound/GatyaGatya.wav" );
 	sound[ SEIKAI         ] = LoadSoundMem( "Sound/Seikai.wav" );

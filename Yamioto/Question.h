@@ -427,7 +427,7 @@ void Question2( int num ) {
 				input = false;
 			}
 
-			if ( key[ KEY_INPUT_A ] || key[ KEY_INPUT_B ] || key[ KEY_INPUT_C ] ) {
+			if ( key[ KEY_INPUT_A ] || key[ KEY_INPUT_B ] || key[ KEY_INPUT_D ] ) {
 				not_answer = true;
 				input = false;
 			}

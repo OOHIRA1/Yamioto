@@ -12,6 +12,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 	ChangeWindowMode( 1 );
 	SetWindowText( "闇音" );
 	SetOneMeter( 1 );
+	//ChangeWindowMode( FALSE );
 	SetAlwaysRunFlag( TRUE );	//別のウィンドウに切り替えても処理が継続される関数
 	SetWindowSize( 1280, 720 );
 	SetGraphMode( 1280, 720, 32 );	//画像の解像度を設定する関数
@@ -30,7 +31,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 		if ( ScreenFlip( ) != 0 || ProcessMessage( ) != 0 || ClearDrawScreen( ) != 0 || updatekey( ) != 0) {
 			break;
 		}
-
+		
 		switch( gamestatus ) {
 		case GAME_START :
 			GameStart( );
@@ -45,10 +46,11 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 
 
 		if (  key[ KEY_INPUT_ESCAPE ] > 1 ) {
+			Ssound( sound[ GAME_START_BGM ] );
 			break;
 		}
 	}
-	//InitSoundMem( );
+	InitSoundMem( );
 	DxLib_End( );
 	return 0;
 }
