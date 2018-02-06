@@ -75,6 +75,7 @@ void Judge( ) {
 	if ( not_answer ) {	//不正解処理
 
 		if ( escape_count == 0 ) {
+			Vsound( sound[ MATIGAI ], 100 );
 			Psound( sound[ MATIGAI ], BACK );
 			player.not_answer_count++;
 
@@ -111,15 +112,19 @@ void Judge( ) {
 
 	if ( answer ) {						//正解処理			
 		if ( escape_count == 0 && player.answer_count > -1 ) {			//正解したら最初に正解音を鳴らす。そのあとにドアの開閉音を鳴らす
-			//Psound( sound[ SEIKAI ], NORMAL );
-			//Psound( sound[ DOOR ], NORMAL );
+			Vsound( sound[ SEIKAI ], 100 );
+			Psound( sound[ SEIKAI ], NORMAL );
+			Vsound( sound[ DOOR ], 100 );
+			Psound( sound[ DOOR ], NORMAL );
 		}
 
 
 		//正解音とドアの開閉音が鳴り終わったら走り出す
 		if ( escape_count == 0 ) {
-			//Psound( sound[ PLAYER_ASIOTO ], LOOP );
+			Vsound( sound[ PLAYER_ASIOTO ], 100 );
+			Psound( sound[ PLAYER_ASIOTO ], LOOP );
 			player.velocity = VGet( 0, 0, 3*5 );
+			enemy.velocity = VGet( 0, 0, -3*5 );
 			SetPlayerVelocity( player.velocity );
 		}
 
@@ -136,12 +141,14 @@ void Judge( ) {
 
 		
 		if ( escape_count == 200 ) {
+			enemy.velocity = VGet( 0, 0, 1 );
 			player.velocity = VGet( 0, 0, 0 ); 
-			//Ssound( sound[ PLAYER_ASIOTO ] );
+			Ssound( sound[ PLAYER_ASIOTO ] );
 			escape_count = 0;
 			player.answer_count++;
 
 			if ( player.answer_count < CLEAR ) {
+				Vsound( sound[ DOOR_GATYA ], 100 );
 				Psound( sound[ DOOR_GATYA ], NORMAL );
 				question_num++;
 
@@ -174,6 +181,7 @@ void debugdraw( ) {
 void GameStart( ) {
 	//スタート画面ＢＧＭ
 	if ( !Csound( sound[ GAME_START_BGM ] ) ) {
+		Vsound( sound[ GAME_START_BGM ], 100 );
 		Psound( sound[ GAME_START_BGM ], LOOP );
 	}
 
@@ -191,8 +199,8 @@ void GameStart( ) {
 void GameMain( ) {
 	//ゲームメインＢＧＭ
 	if ( !Csound( sound[ GAME_MAIN_BGM ] ) ) {
-		Psound( sound[ GAME_MAIN_BGM ], LOOP );
 		Vsound( sound[ GAME_MAIN_BGM ], 100 );
+		Psound( sound[ GAME_MAIN_BGM ], LOOP );
 	}
 
 	//初期歌声
@@ -283,6 +291,7 @@ void GameMain( ) {
 	Question( /*ExerciseBooks_num*/1, question_num );
 	debugdraw();
 	SetPlayerVelocity( player.velocity );
+	SetEnemyVelocity( enemy.velocity, sound[ ENEMY_VOICE ] );
 }
 
 
@@ -301,6 +310,7 @@ void GameResult( ) {
 
 		DrawString( 100, 150, "PUSH SPACE", GetColor( 255, 255, 255 ) );
 		if ( key[ KEY_INPUT_SPACE ] ) {
+			Ssound( sound[ GAME_CLEAR ] );
 			gamestatus = GAME_START;
 			}
 
@@ -320,6 +330,7 @@ void GameResult( ) {
 
 			DrawString( 100, 150, "PUSH SPACE", GetColor( 255, 255, 255 ) );
 			if ( key[ KEY_INPUT_SPACE ] ) {
+				Ssound( sound[ GAME_OVER ] );
 				gamestatus = GAME_START;
 			}
 		
