@@ -50,10 +50,3 @@ void SetOneMeter( float distance ) {
 	Set3DSoundOneMetre( distance );
 }
 
-void SetPlayerVelocity( VECTOR velocity ) {
-	Set3DSoundListenerVelocity( velocity );
-}
-
-void SetEnemyVelocity( VECTOR velocity, int handle ) {
-	Set3DVelocitySoundMem( velocity, handle );
-}

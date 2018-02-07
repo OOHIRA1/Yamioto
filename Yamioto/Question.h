@@ -26,6 +26,11 @@ void QuesitionInitialize( ) {
 	font_handle2 = CreateFontToHandle( "‚l‚r –¾’©", 20, 2 );
 	cr = GetColor( 255, 255, 255 );
 	question_num = 1;
+	chooseWayFlag = true;
+	way = NON_CHOOSE_WAY;
+	answer = false;
+	not_answer = false;
+	input = false;
 }
 
 void Question( int a, int num ) {
