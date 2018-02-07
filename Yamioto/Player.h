@@ -5,7 +5,6 @@
 struct Player {
 	VECTOR position;
 	VECTOR direction;
-	VECTOR velocity;
 	int answer_count = -1;	//³‰ð”	//Å‰‚Éanswer‚ðture‚Åˆ—‚·‚é‚½‚ß-1‚Å‰Šú‰»
 	int not_answer_count = 0; //•s³‰ð”
 };
@@ -13,7 +12,6 @@ struct Player {
 void PlayerInitialize( struct Player *player ) {
 	player->position = VGet( 0, 0, FIRST_DISTANCE - 10 );
 	player->direction = VGet( 0, 0, 1 );
-	player->velocity = VGet( 0, 0, 0 );
 	player->answer_count = -1;
 	player->not_answer_count = 0;
 
