@@ -270,7 +270,7 @@ void GameMain( ) {
 		question_num = 1;
 	}
 
-	Question( /*ExerciseBooks_num*/1, question_num );
+	Question( /*ExerciseBooks_num*/0, question_num );
 	debugdraw();
 }
 

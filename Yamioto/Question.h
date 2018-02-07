@@ -12,6 +12,8 @@ int font_handle;
 int font_handle2;
 int cr;
 
+int selectedSentence = 0;
+
 void QuesitionInitialize( );
 void Question( int, int );
 void Question1( int );
@@ -22,6 +24,23 @@ void QuesitionInitialize( ) {
 	font_handle = CreateFontToHandle( "ＭＳ 明朝", 20, 3 );
 	font_handle2 = CreateFontToHandle( "ＭＳ 明朝", 20, 2 );
 	cr = GetColor( 255, 255, 255 );
+}
+
+void cursor( ) {
+	DrawCircle( SELECTED_POS_X - 20,SELECTED_POS_Y + 10 + ( CURSOR_SELECT_POS_Y * selectedSentence ),5,cr,true );
+	if ( key[ KEY_INPUT_DOWN ] == 1 && 
+	     selectedSentence < 3 ) {	//一番下に来たらそれ以上進まない //選択肢が４つあるので4 - 1
+
+		selectedSentence++;
+
+	}
+
+	if ( key[ KEY_INPUT_UP ] == 1 && 
+	     selectedSentence > 0 ) {	//一番下に来たらそれ以上進まない //選択肢が４つあるので4 - 1
+
+		selectedSentence--;
+
+	}
 }
 
 void Question( int a, int num ) {
@@ -44,8 +63,27 @@ void Question1( int num ) {
 		if ( input == true ) {
 			DrawFormatStringToHandle( QUESTION_POS_X, QUESTION_POS_Y, cr, font_handle, "わさびを食べて鼻がツーンとした時に飲むと収まるものは？" );
 			DrawFormatStringToHandle( SELECTED_POS_X, SELECTED_POS_Y, cr, font_handle2, " A：コーラ\n B：水\n C：激辛スープ\n D：オレンジジュース" );
+			cursor( );
+		
+			if ( key[ KEY_INPUT_RETURN ] ) {
 
-			if ( key[ KEY_INPUT_A ] ) {
+				if ( selectedSentence == 0 ) {
+
+					answer = true;
+					input = false;
+
+				} else {
+
+					not_answer = true;
+					input = false;
+
+				}
+			}
+
+
+
+		}
+			/*if ( key[ KEY_INPUT_A ] ) {
 				answer = true;
 				input = false;
 			}
@@ -54,7 +92,7 @@ void Question1( int num ) {
 				not_answer = true;
 				input = false;
 			}
-		}
+		}*/
 		break;
 
 	case 2 :
