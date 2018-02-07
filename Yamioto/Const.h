@@ -39,6 +39,7 @@ enum Sound{
 };
 
 enum Way {
+	NON_CHOOSE_WAY,
 	STRAIGHT_WAY,
 	RIGHT_WAY,
 	LEFT_WAY

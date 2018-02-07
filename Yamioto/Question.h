@@ -3,14 +3,17 @@
 #include "DxLib.h"
 #include "Key.h"
 
-int question_num = 0;	//問題番号
+int question_num = 1;	//問題番号
 bool answer = true;
 bool not_answer = false;
 bool input = true;
+bool chooseWayFlag = true;
 
 int font_handle;
 int font_handle2;
 int cr;
+
+enum Way way = NON_CHOOSE_WAY;
 
 void QuesitionInitialize( );
 void Question( int, int );
@@ -22,6 +25,7 @@ void QuesitionInitialize( ) {
 	font_handle = CreateFontToHandle( "ＭＳ 明朝", 20, 3 );
 	font_handle2 = CreateFontToHandle( "ＭＳ 明朝", 20, 2 );
 	cr = GetColor( 255, 255, 255 );
+	question_num = 1;
 }
 
 void Question( int a, int num ) {
@@ -410,11 +414,6 @@ void Question1( int num ) {
 	}
 }
 
-
-
-
-
-
 void Question2( int num ) {
 	switch( num ) {
 	case 1 :
@@ -787,8 +786,6 @@ void Question2( int num ) {
 	}
 }
 
-
-
 void Question3( int num ) {
 	switch( num ) {
 	case 1 :
@@ -1158,5 +1155,23 @@ void Question3( int num ) {
 
 	default :
 		break;
+	}
+}
+
+//--道を選択する関数
+void ChooseWay( ) {
+	DrawFormatStringToHandle( SELECTED_POS_X, SELECTED_POS_Y, cr, font_handle, "道を選択してください。\n" );
+	DrawFormatStringToHandle( SCREEN_WIDTH_CENTER, SCREEN_HEIGHT_CENTER, cr, font_handle2, "←：X　　↑：Z　　→：V" );
+	if ( key[ KEY_INPUT_Z ] ) { 
+		way = STRAIGHT_WAY; 
+		chooseWayFlag = false;
+	}
+	else if ( key[ KEY_INPUT_X ] ) {
+		way = RIGHT_WAY;
+		chooseWayFlag = false;
+	}
+	else if ( key[ KEY_INPUT_V ] ) { 
+		way = LEFT_WAY;
+		chooseWayFlag = false;
 	}
 }

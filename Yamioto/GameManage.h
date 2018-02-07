@@ -7,7 +7,6 @@
 #include <time.h>
 
 enum GameStatus gamestatus = GAME_START;
-enum Way way = STRAIGHT_WAY;
 
 int bright = 0;
 bool bright_max = true;
@@ -31,6 +30,8 @@ void Initialization( );
 void Judge( );
 
 
+
+
 void GameStart( );
 void GameMain( );
 void GameResult( );
@@ -51,7 +52,6 @@ void Initialization( ) {
 
 	flame_count = 0;
 	distance = FIRST_DISTANCE - 10;
-	question_num = 0;
 	escape_count = 0;
 	gameoverWait_count = 0;
 	bright = 0;
@@ -65,46 +65,44 @@ void Initialization( ) {
 	x4 = SCREEN_WIDTH_CENTER;
 	y4 = SCREEN_HEIGHT_CENTER;
 
-	answer = true;
+	answer = false;
 	not_answer = false;
-	input = true;
+	input = false;	
 	sounded = false;
 	gameover_wait = true;
 
 
 }
 
-void chooseWay( ) {
-	if ( input2 ) {
-		if ( key[ KEY_INPUT_Z ] ) { 
-			way = STRAIGHT_WAY; 
-			input2 = false;
-		}
-		else if ( key[ KEY_INPUT_X ] ) {
-			way = RIGHT_WAY;
-			input2 = false;
-		}
-		else if ( key[ KEY_INPUT_V ] ) { 
-			way = LEFT_WAY;
-			input2 = false;
-		}
-	}
 
-	if ( !input2 ) {
-		if ( way = STRAIGHT_WAY ) {
-			//真ん中の道のとき
-		} else if ( way = RIGHT_WAY ) {
-			//右の道のとき
-		} else if ( way = LEFT_WAY ) {
-			//左の道のとき
-		}
-	}
-
-
-}
 
 
 void Judge( ) {
+	if ( !chooseWayFlag && !input && !answer && !not_answer  ) {						//道を選んで問題表示してないときの処理			
+
+		//走り出す
+		if ( escape_count == 0 ) {
+			Vsound( sound[ PLAYER_ASIOTO ], 100 );
+			Psound( sound[ PLAYER_ASIOTO ], LOOP );
+			player.velocity = VGet( 0, 0, 3*5 );
+			SetPlayerVelocity( player.velocity );
+		}
+
+			
+		escape_count++;
+
+		player.position.z += escape_count % 21 / 20;
+		SetPlayerPosAndDir( player.position, VAdd( player.position, player.direction ) );
+
+		if ( escape_count == 100 ) {
+			player.velocity = VGet( 0, 0, 0 ); 
+			Ssound( sound[ PLAYER_ASIOTO ] );
+			Vsound( sound[ DOOR_GATYA ], 100 );
+			Psound( sound[ DOOR_GATYA ], NORMAL );
+			escape_count = 0;
+			input = true;
+		}
+	}
 
 	if ( not_answer ) {	//不正解処理
 
@@ -142,8 +140,6 @@ void Judge( ) {
 
 	}
 
-
-
 	if ( answer ) {						//正解処理			
 		if ( escape_count == 0 && player.answer_count > -1 ) {			//正解したら最初に正解音を鳴らす。そのあとにドアの開閉音を鳴らす
 			Vsound( sound[ SEIKAI ], 100 );
@@ -166,6 +162,8 @@ void Judge( ) {
 
 			
 		escape_count++;
+
+		//始めと正解後の移動距離調整
 		if ( player.answer_count > -1 ) {	
 			distance += escape_count % 11 / 10;
 		} else {
@@ -184,11 +182,13 @@ void Judge( ) {
 		}
 
 		
+
 		if ( escape_count == 200 ) {
 			switch( player.not_answer_count ) {
-			case 0:
+			case 0: 
 				enemy.velocity = VGet( 0, 0, 1 );
 				SetEnemyVelocity( enemy.velocity, sound[ ENEMY_VOICE ] );
+				break;
 			case 1:
 				enemy.velocity = VGet( 0, 0, 1.5 );
 				SetEnemyVelocity( enemy.velocity, sound[ ENEMY_VOICE ] );
@@ -203,16 +203,15 @@ void Judge( ) {
 			escape_count = 0;
 			player.answer_count++;
 
-			if ( player.answer_count < CLEAR ) {
-				Vsound( sound[ DOOR_GATYA ], 100 );
-				Psound( sound[ DOOR_GATYA ], NORMAL );
+			if ( player.answer_count < CLEAR ) {	//player.answer_countが必要正解数以下のとき
+				
 				question_num++;
 
 				srand( time( NULL ) );
 				ExerciseBooks_num = rand( ) % 3;
 
-				input = true;
 				answer = false;
+				chooseWayFlag = true;	//道を選べるようにする
 			} else {
 				gamestatus = GAME_RESULT;
 			}
@@ -220,8 +219,8 @@ void Judge( ) {
 		}
 
 	}
-
 }
+
 
 
 void debugdraw( ) {
@@ -269,7 +268,7 @@ void GameMain( ) {
 
 	//距離が縮まる
 	flame_count++;
-	if ( !answer ) {
+	if ( !answer || chooseWayFlag ) {	//問題を答えていないとき または　道を選んでいないとき
 		switch( player.not_answer_count ) {
 		case 0:
 			distance -= flame_count % 61 / 60;
@@ -285,6 +284,10 @@ void GameMain( ) {
 			break;
 		}
 		SetEnemySoundPos( enemy.position, sound[ ENEMY_VOICE ] );
+	}
+
+	if ( chooseWayFlag ) {
+		ChooseWay( );
 	}
 
 
@@ -331,7 +334,9 @@ void GameMain( ) {
 	SetDrawBright( 255, 255, 255 );							
 
 	//問題に答えたら
-	Judge( );
+	if ( !chooseWayFlag ) {
+		Judge( );
+	}
 
 	//制限時間が０になったら
 	if ( distance == 0 ) {
