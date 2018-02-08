@@ -64,14 +64,14 @@ void load_question( ) {
 	}
 	fclose( fp );
 
-	for ( int i = 0; i < 3 * 18; i++ ) {
+	for ( int i = 0; i < 3 * QUESTION_MAX; i++ ) {
 		if ( questionStatement[ i ][ 0 ] == '/' ) {
 			questionStatement[ i ][ 0 ] = ' ';
 			if ( questionStatement[ i ][ 1 ] != '\0' ) {
-				for ( int j = 0; j < CHOICES_ELEMENT - 1; j++ ) {
+				for ( int j = 0; j < QUESTION_ELEMENT - 1; j++ ) {
 					questionStatement[ i ][ j ] = questionStatement[ i ][ j + 1 ];
 				}
-				questionStatement[ i ][ CHOICES_ELEMENT - 1 ] = '\0';
+				questionStatement[ i ][ QUESTION_ELEMENT - 1 ] = '\0';
 			}
 		}
 	}
