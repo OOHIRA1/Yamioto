@@ -27,4 +27,5 @@ void load_resource( ) {
 	resource[ 1 ] = LoadGraph( "Resource/hikari.png" );
 	resource[ 2 ] = LoadGraph( "Resource/gameclear.png" );
 	resource[ 3 ] = LoadGraph( "Resource/aka.png" );
+	resource[ 4 ] = LoadGraph( "Resource/cursor.png" );
 }

@@ -74,7 +74,7 @@ void Judge( ) {
 
 		if ( escape_count == 0 ) {
 			Vsound( sound[ MATIGAI ], 100 );
-			Psound( sound[ MATIGAI ], BACK );
+			Psound( sound[ MATIGAI ], NORMAL );
 			player.not_answer_count++;
 
 		}

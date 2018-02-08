@@ -2,6 +2,7 @@
 
 #include "DxLib.h"
 #include "Key.h"
+//#include "Load.h"
 
 int question_num = 0;	//問題番号
 bool answer = true;
@@ -10,7 +11,8 @@ bool input = true;
 
 int font_handle;
 int font_handle2;
-int cr;
+int cr;					//問題文の色
+int cr2;				//選択肢の色
 
 int selectedSentence = 0;
 
@@ -20,14 +22,24 @@ void Question1( int );
 void Question2( int );
 void Question3( int );
 
+void changeColor( char* string, int color ) {
+	DrawFormatStringToHandle( SELECTED_POS_X, SELECTED_POS_Y, cr2, font_handle2, string );
+}
+
+
+
+
 void QuesitionInitialize( ) {
 	font_handle = CreateFontToHandle( "ＭＳ 明朝", 20, 3 );
 	font_handle2 = CreateFontToHandle( "ＭＳ 明朝", 20, 2 );
 	cr = GetColor( 255, 255, 255 );
+	cr2 = GetColor( 255, 255, 255 );
 }
 
+//--カーソルを表示する関数
 void cursor( ) {
 	DrawCircle( SELECTED_POS_X - 20,SELECTED_POS_Y + 10 + ( CURSOR_SELECT_POS_Y * selectedSentence ),5,cr,true );
+	//DrawGraph( SELECTED_POS_X - 10, SELECTED_POS_Y + 5 + ( CURSOR_SELECT_POS_Y * selectedSentence ), resource[ 4 ], TRUE );
 	if ( key[ KEY_INPUT_DOWN ] == 1 && 
 	     selectedSentence < 3 ) {	//一番下に来たらそれ以上進まない //選択肢が４つあるので4 - 1
 
@@ -58,22 +70,31 @@ void Question( int a, int num ) {
 }
 
 void Question1( int num ) {
+	char string[ 4 ][ 100 ] =  {{" A：コーラ \n"},  {"B：水\n"}, {"C：激辛スープ\n"}, {"D：オレンジジュース"} };
+	cr = GetColor( 255, 255, 255 );
+	cr2 = GetColor( 255, 255, 255 );
 	switch( num ) {
 	case 1 :
 		if ( input == true ) {
 			DrawFormatStringToHandle( QUESTION_POS_X, QUESTION_POS_Y, cr, font_handle, "わさびを食べて鼻がツーンとした時に飲むと収まるものは？" );
-			DrawFormatStringToHandle( SELECTED_POS_X, SELECTED_POS_Y, cr, font_handle2, " A：コーラ\n B：水\n C：激辛スープ\n D：オレンジジュース" );
+			DrawFormatStringToHandle( SELECTED_POS_X, SELECTED_POS_Y, cr, font_handle2, " A：コーラ\n" );
+			DrawFormatStringToHandle( SELECTED_POS_X, SELECTED_POS_Y + CURSOR_SELECT_POS_Y , cr, font_handle2, " B：水\n" );
+			DrawFormatStringToHandle( SELECTED_POS_X, SELECTED_POS_Y + CURSOR_SELECT_POS_Y * 2, cr, font_handle2, " C：激辛スープ\n" );
+			DrawFormatStringToHandle( SELECTED_POS_X, SELECTED_POS_Y + CURSOR_SELECT_POS_Y * 3, cr, font_handle2, " D：オレンジジュース" );
+
 			cursor( );
 		
 			if ( key[ KEY_INPUT_RETURN ] ) {
 
 				if ( selectedSentence == 0 ) {
-
+					cr2 = GetColor( 0, 255, 0 );
+					changeColor( string[ 0 ], cr2 );
 					answer = true;
 					input = false;
 
 				} else {
-
+					cr2 = GetColor( 255, 0, 0 );
+					changeColor( string[ selectedSentence ], cr2 );
 					not_answer = true;
 					input = false;
 
