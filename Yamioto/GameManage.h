@@ -271,6 +271,11 @@ void GameMain( ) {
 	}
 
 	Question( /*ExerciseBooks_num*/0, question_num );
+
+	if ( input ) {
+		cursor( );
+	}
+
 	debugdraw();
 }
 

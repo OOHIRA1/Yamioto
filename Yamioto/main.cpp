@@ -26,6 +26,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 	//èâä˙âª
 	load_sound( );
 	load_resource( );
+	load_question( );
 
 	while ( 1 ) {
 		if ( ScreenFlip( ) != 0 || ProcessMessage( ) != 0 || ClearDrawScreen( ) != 0 || updatekey( ) != 0) {
