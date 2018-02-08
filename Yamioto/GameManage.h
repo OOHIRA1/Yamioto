@@ -60,9 +60,6 @@ void Initialization( ) {
 	x4 = SCREEN_WIDTH_CENTER;
 	y4 = SCREEN_HEIGHT_CENTER;
 
-	answer = true;
-	not_answer = false;
-	input = true;
 	sounded = false;
 	gameover_wait = true;
 

@@ -30,6 +30,9 @@ void changeColor( int selectedchoice, char* string, int color ) {
 
 
 void QuesitionInitialize( ) {
+	answer = true;
+	not_answer = false;
+	input = false;
 	font_handle = CreateFontToHandle( "ÇlÇr ñæí©", 20, 3 );
 	font_handle2 = CreateFontToHandle( "ÇlÇr ñæí©", 20, 2 );
 	cr = GetColor( 255, 255, 255 );
@@ -40,18 +43,12 @@ void QuesitionInitialize( ) {
 void cursor( ) {
 	DrawCircle( CHOICES_POS_X - 20, CHOICES_POS_Y + 10 + ( CURSOR_SELECT_POS_Y * selectedSentence ), 5, cr, true );
 	//DrawGraph( CHOICES_POS_X - 10, CHOICES_POS_Y + 5 + ( CURSOR_SELECT_POS_Y * selectedSentence ), resource[ 4 ], TRUE );
-	if ( key[ KEY_INPUT_DOWN ] == 1 && 
-	     selectedSentence < 3 ) {	//àÍî‘â∫Ç…óàÇΩÇÁÇªÇÍà»è„êiÇ‹Ç»Ç¢ //ëIëéàÇ™ÇSÇ¬Ç†ÇÈÇÃÇ≈4 - 1
-
+	if ( key[ KEY_INPUT_DOWN ] == 1 && selectedSentence < 3 ) {	//àÍî‘â∫Ç…óàÇΩÇÁÇªÇÍà»è„êiÇ‹Ç»Ç¢ //ëIëéàÇ™ÇSÇ¬Ç†ÇÈÇÃÇ≈4 - 1
 		selectedSentence++;
-
 	}
 
-	if ( key[ KEY_INPUT_UP ] == 1 && 
-	     selectedSentence > 0 ) {	//àÍî‘â∫Ç…óàÇΩÇÁÇªÇÍà»è„êiÇ‹Ç»Ç¢ //ëIëéàÇ™ÇSÇ¬Ç†ÇÈÇÃÇ≈4 - 1
-
+	if ( key[ KEY_INPUT_UP ] == 1 && selectedSentence > 0 ) {	//àÍî‘â∫Ç…óàÇΩÇÁÇªÇÍà»è„êiÇ‹Ç»Ç¢ //ëIëéàÇ™ÇSÇ¬Ç†ÇÈÇÃÇ≈4 - 1
 		selectedSentence--;
-
 	}
 }
 
@@ -76,17 +73,19 @@ void Question1( int num ) {
 	switch( num ) {
 	case 1 :
 		if ( input == true ) {
-			DrawFormatStringToHandle( QUESTION_POS_X, QUESTION_POS_Y, cr, font_handle, questionStatement[ 0 ] );
-			DrawFormatStringToHandle( CHOICES_POS_X, CHOICES_POS_Y, cr, font_handle2, choices[ 0 ] );
-			DrawFormatStringToHandle( CHOICES_POS_X, CHOICES_POS_Y + CURSOR_SELECT_POS_Y , cr, font_handle2, choices[ 1 ] );
-			DrawFormatStringToHandle( CHOICES_POS_X, CHOICES_POS_Y + CURSOR_SELECT_POS_Y * 2, cr, font_handle2, choices[ 2 ] );
-			DrawFormatStringToHandle( CHOICES_POS_X, CHOICES_POS_Y + CURSOR_SELECT_POS_Y * 3, cr, font_handle2, choices[ 3 ] );
+			for ( int i = 0; i < 3; i++ ) {
+				DrawFormatStringToHandle( QUESTION_POS_X, QUESTION_POS_Y + ( QUESTION_STATEMENT_SEPARATE * i ), cr, font_handle, questionStatement[ i + ( num - 1 ) * 3 ] );
+			}
+			
+			for ( int i = 0; i < 4; i++ ) {
+				DrawFormatStringToHandle( CHOICES_POS_X, CHOICES_POS_Y + ( CURSOR_SELECT_POS_Y * i ), cr, font_handle2, choices[ i + ( num - 1 ) * 4 ] );
+			}
 
 			//cursor( );
 		
 			if ( key[ KEY_INPUT_RETURN ] ) {
 
-				if ( selectedSentence == 0 ) {
+				if ( selectedSentence == answerNum[ num - 1 ] ) {
 
 					cr2 = GetColor( 0, 255, 0 );
 					changeColor( selectedSentence, choices[ selectedSentence + ( num - 1 ) * 4 ], cr2 );
