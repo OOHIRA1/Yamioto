@@ -18,6 +18,8 @@ int ExerciseBooks_num;
 int gameoverWait_count = 0;
 bool gameover_wait = true;
 
+bool debug = false;
+
 
 int x1 = SCREEN_WIDTH_CENTER, y1 = SCREEN_HEIGHT_CENTER, 
 	x2 = SCREEN_WIDTH_CENTER, y2 = SCREEN_HEIGHT_CENTER, 
@@ -34,6 +36,15 @@ void GameResult( );
 
 struct Player player;
 struct Enemy enemy;
+
+void debugdraw( ) {
+	DrawBoxAA( enemy.position.x - 8,  (480 - (enemy.position.z + 8 )), enemy.position.x + 8, (480 - ( enemy.position.z - 8 )), GetColor( 255, 255, 255 ), TRUE );
+	DrawBoxAA( player.position.x - 8,  (480 - (player.position.z + 8 )), player.position.x + 8, (480 - ( player.position.z - 8 )), GetColor( 0, 0, 255 ), TRUE );
+
+	//Žc‚è‹——£‚ð•`‰æ
+	DrawFormatString( 0, 0, GetColor( 255, 255, 255 ), "%d", distance );
+
+}
 
 void Initialization( ) {
 
@@ -145,16 +156,6 @@ void Judge( ) {
 		}
 
 	}
-
-}
-
-
-void debugdraw( ) {
-	DrawBoxAA( enemy.position.x - 8,  (480 - (enemy.position.z + 8 )), enemy.position.x + 8, (480 - ( enemy.position.z - 8 )), GetColor( 255, 255, 255 ), TRUE );
-	DrawBoxAA( player.position.x - 8,  (480 - (player.position.z + 8 )), player.position.x + 8, (480 - ( player.position.z - 8 )), GetColor( 0, 0, 255 ), TRUE );
-
-	//Žc‚è‹——£‚ð•`‰æ
-	DrawFormatString( 0, 0, GetColor( 255, 255, 255 ), "%d", distance );
 
 }
 
@@ -273,7 +274,17 @@ void GameMain( ) {
 		cursor( );
 	}
 
-	debugdraw();
+	if ( key[ KEY_INPUT_SPACE ] == 1 ) {
+		if ( !debug ) {
+			debug = true;
+		} else {
+			debug = false;
+		}
+	}
+
+	if ( debug ) {
+		debugdraw( );
+	}
 }
 
 
