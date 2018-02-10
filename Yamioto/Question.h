@@ -1,8 +1,11 @@
 #pragma once
 
 #include "DxLib.h"
-#include "Key.h"
-//#include "Load.h"
+/*
+参照しているヘッダー
+#include "Input.h"
+#include "Load.h"
+*/
 
 int question_num = 0;	//問題番号
 bool answer = true;
@@ -39,8 +42,8 @@ void QuesitionInitialize( ) {
 	cr2 = GetColor( 255, 255, 255 );
 }
 
-//--カーソルを表示する関数
-void cursor( ) {
+//--カーソルを表示する関数(キーボード対応)
+void KeybordCursor( ) {
 	DrawCircle( CHOICES_POS_X - 20, CHOICES_POS_Y + 10 + ( CURSOR_SELECT_POS_Y * selectedSentence ), 5, cr, true );
 	//DrawGraph( CHOICES_POS_X - 10, CHOICES_POS_Y + 5 + ( CURSOR_SELECT_POS_Y * selectedSentence ), resource[ 4 ], TRUE );
 	if ( key[ KEY_INPUT_DOWN ] == 1 && selectedSentence < 3 ) {	//一番下に来たらそれ以上進まない //選択肢が４つあるので4 - 1
@@ -50,6 +53,10 @@ void cursor( ) {
 	if ( key[ KEY_INPUT_UP ] == 1 && selectedSentence > 0 ) {	//一番下に来たらそれ以上進まない //選択肢が４つあるので4 - 1
 		selectedSentence--;
 	}
+}
+
+void JoypadCursor( ) { 
+
 }
 
 void Question( int a, int num ) {

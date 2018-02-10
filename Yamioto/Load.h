@@ -1,6 +1,9 @@
 #pragma once
 
-#include "Dxlib.h"
+/*
+参照しているヘッダー
+#include "DxLib.h"
+*/
 #include <stdio.h>
 
 int sound[ 20 ]; //音楽のハンドル

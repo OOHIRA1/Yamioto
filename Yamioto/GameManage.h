@@ -1,6 +1,9 @@
 #pragma once
 
+/*
+参照しているヘッダー
 #include "Const.h"
+*/
 #include "Question.h"
 #include "Player.h"
 #include "Enemy.h"
@@ -94,7 +97,7 @@ void Judge( ) {
 			escape_count = 0;
 			question_num++;
 
-			srand( time( NULL ) );
+			srand( ( unsigned int )time( NULL ) );
 			ExerciseBooks_num = rand( ) % 3;
 
 			input = true;
@@ -144,7 +147,7 @@ void Judge( ) {
 				Psound( sound[ DOOR_GATYA ], NORMAL );
 				question_num++;
 
-				srand( time( NULL ) );
+				srand( ( unsigned int )time( NULL ) );
 				ExerciseBooks_num = rand( ) % 3;
 
 				input = true;
@@ -271,7 +274,7 @@ void GameMain( ) {
 	Question( /*ExerciseBooks_num*/0, question_num );
 
 	if ( input ) {
-		cursor( );
+		KeybordCursor( );
 	}
 
 	if ( key[ KEY_INPUT_SPACE ] == 1 ) {

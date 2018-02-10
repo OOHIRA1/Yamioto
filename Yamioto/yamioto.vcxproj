@@ -168,7 +168,7 @@
     <ClInclude Include="Const.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="GameManage.h" />
-    <ClInclude Include="Key.h" />
+    <ClInclude Include="Input.h" />
     <ClInclude Include="Load.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Question.h" />

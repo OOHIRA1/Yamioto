@@ -3,7 +3,7 @@
 const int KEY_MAX = 256;
 
 const int FIRST_DISTANCE = 60;	//playerとenemeyの初期距離	30
-const int CLEAR = 15;		//必要正解数
+const int CLEAR = 1;		//必要正解数
 const int QUESTION_MAX = 20;	//最大問題数
 const int SCREEN_WIDTH_CENTER = 1280 / 2;
 const int SCREEN_HEIGHT_CENTER = 720 / 2;
@@ -28,7 +28,7 @@ enum SoundStatus {
 	LOOP
 };
 
-enum Sound{
+enum Sound {
 	ENEMY_VOICE,
 	PLAYER_ASIOTO,
 	DOOR,
@@ -39,4 +39,14 @@ enum Sound{
 	GAME_OVER,
 	GAME_START_BGM,
 	GAME_MAIN_BGM
+};
+
+enum Joypad {
+	DOWN,
+	LEFT,
+	RIGHT,
+	UP,
+	INPUT_2,
+	INPUT_4,
+	JOYPADMAX
 };

@@ -1,9 +1,10 @@
 #include "DxLib.h"
 #include "Const.h"
-#include "Key.h"
+#include "Input.h"
 #include "Load.h"
 #include "Sound.h"
 #include "GameManage.h"
+
 
 
 
@@ -29,9 +30,11 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 	load_question( );
 
 	while ( 1 ) {
-		if ( ScreenFlip( ) != 0 || ProcessMessage( ) != 0 || ClearDrawScreen( ) != 0 || updatekey( ) != 0) {
+		if ( ScreenFlip( ) != 0 || ProcessMessage( ) != 0 || ClearDrawScreen( ) != 0 ) {
 			break;
 		}
+
+		updateDevice( );
 		
 		switch( gamestatus ) {
 		case GAME_START :

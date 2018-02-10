@@ -1,6 +1,8 @@
 #pragma once
-
+/*
+参照しているヘッダー
 #include "DxLib.h"
+*/
 
 void Psound( int handle, int type ) {
 	switch ( type ) {
