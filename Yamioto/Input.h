@@ -4,11 +4,10 @@
 #include "DxLib.h"
 */
 int key[ KEY_MAX ];
-char key_c[ KEY_MAX ];
-
 int joypad[ JOYPADMAX ];
 
 int updatekey( ) {
+	char key_c[ KEY_MAX ];
 	GetHitKeyStateAll( key_c );
 
 	 for ( int i = 0; i < KEY_MAX; i++ ) {
@@ -28,7 +27,9 @@ int updateJoypad( ) {
 		PAD_INPUT_LEFT, 
 		PAD_INPUT_RIGHT, 
 		PAD_INPUT_UP, 
-		PAD_INPUT_2, 
+		PAD_INPUT_1,
+		PAD_INPUT_2,
+		PAD_INPUT_3,
 		PAD_INPUT_4 
 	};
 

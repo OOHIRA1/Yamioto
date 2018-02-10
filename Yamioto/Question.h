@@ -14,8 +14,8 @@ bool input = true;
 
 int font_handle;
 int font_handle2;
-int cr = GetColor( 255, 255, 255 );					//問題文の色
-int cr2 = GetColor( 255, 255, 255 );				//選択肢の色
+int cr;
+int cr2;
 
 int selectedSentence = 0;
 
@@ -36,27 +36,37 @@ void QuesitionInitialize( ) {
 	answer = true;
 	not_answer = false;
 	input = false;
-	font_handle = CreateFontToHandle( "ＭＳ 明朝", 20, 3 );
-	font_handle2 = CreateFontToHandle( "ＭＳ 明朝", 20, 2 );
-	cr = GetColor( 255, 255, 255 );	
-	cr2 = GetColor( 255, 255, 255 );
+	font_handle = CreateFontToHandle( "ＭＳ 明朝", 20, 5 );
+	font_handle2 = CreateFontToHandle( "ＭＳ 明朝", 20, 3 );
+	cr = GetColor( 255, 255, 255 );		//問題文の色
+	cr2 = GetColor( 255, 255, 255 );	//選択肢の色
 }
 
-//--カーソルを表示する関数(キーボード対応)
-void KeybordCursor( ) {
-	DrawCircle( CHOICES_POS_X - 20, CHOICES_POS_Y + 10 + ( CURSOR_SELECT_POS_Y * selectedSentence ), 5, cr, true );
+////--カーソルを表示する関数(キーボード対応)
+//void KeybordCursor( ) {
+//	DrawCircle( CHOICES_POS_X - 20, CHOICES_POS_Y + 10 + ( CURSOR_SELECT_POS_Y * selectedSentence ), 5, cr, true );
+//	//DrawGraph( CHOICES_POS_X - 10, CHOICES_POS_Y + 5 + ( CURSOR_SELECT_POS_Y * selectedSentence ), resource[ 4 ], TRUE );
+//	if ( key[ KEY_INPUT_DOWN ] == 1 && selectedSentence < 3 ) {	//一番下に来たらそれ以上進まない //選択肢が４つあるので4 - 1
+//		selectedSentence++;
+//	}
+//
+//	if ( key[ KEY_INPUT_UP ] == 1 && selectedSentence > 0 ) {	//一番下に来たらそれ以上進まない //選択肢が４つあるので4 - 1
+//		selectedSentence--;
+//	}
+//}
+
+//--カーソルを表示する関数(ジョイパット対応)
+void JoypadCursor( ) { 
+	DrawCircle( CHOICES_POS_X - 20, CHOICES_POS_Y + 11 + ( CURSOR_SELECT_POS_Y * selectedSentence ), 5, cr, true );
 	//DrawGraph( CHOICES_POS_X - 10, CHOICES_POS_Y + 5 + ( CURSOR_SELECT_POS_Y * selectedSentence ), resource[ 4 ], TRUE );
-	if ( key[ KEY_INPUT_DOWN ] == 1 && selectedSentence < 3 ) {	//一番下に来たらそれ以上進まない //選択肢が４つあるので4 - 1
+
+	if ( joypad[ DOWN ] == 1 && selectedSentence < 3 ) {	//一番下に来たらそれ以上進まない //選択肢が４つあるので4 - 1
 		selectedSentence++;
 	}
 
-	if ( key[ KEY_INPUT_UP ] == 1 && selectedSentence > 0 ) {	//一番下に来たらそれ以上進まない //選択肢が４つあるので4 - 1
+	if ( joypad[ UP ] == 1 && selectedSentence > 0 ) {	//一番下に来たらそれ以上進まない //選択肢が４つあるので4 - 1
 		selectedSentence--;
 	}
-}
-
-void JoypadCursor( ) { 
-
 }
 
 void Question( int a, int num ) {
@@ -73,8 +83,8 @@ void Question( int a, int num ) {
 	}
 }
 
-void Question1( int num ) {
-	cr2 = GetColor( 255, 255, 255 );
+void Question1( int num ) {	
+	 cr2 = GetColor( 255, 255, 255 );
 	if ( input == true ) {
 		for ( int i = 0; i < 3; i++ ) {		//問題文表示
 			DrawFormatStringToHandle( QUESTION_POS_X, QUESTION_POS_Y + ( QUESTION_STATEMENT_SEPARATE * i ), cr, font_handle, questionStatement[ i + ( num - 1 ) * 3 ] );
@@ -83,8 +93,9 @@ void Question1( int num ) {
 		for ( int i = 0; i < 4; i++ ) {		//選択肢表示
 			DrawFormatStringToHandle( CHOICES_POS_X, CHOICES_POS_Y + ( CURSOR_SELECT_POS_Y * i ), cr2, font_handle2, choices[ i + ( num - 1 ) * 4 ] );
 		}
-	
-		if ( key[ KEY_INPUT_RETURN ] ) {
+
+
+		if ( key[ KEY_INPUT_RETURN ] == 1 || joypad[ INPUT_2 ] == 1 ) {
 
 			if ( selectedSentence == answerNum[ num - 1 ] ) {
 
@@ -101,7 +112,9 @@ void Question1( int num ) {
 				input = false;
 
 			}
+		
 		}
+		
 	}
 }
 

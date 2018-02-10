@@ -100,6 +100,7 @@ void Judge( ) {
 			srand( ( unsigned int )time( NULL ) );
 			ExerciseBooks_num = rand( ) % 3;
 
+			selectedSentence = 0;
 			input = true;
 			not_answer = false;
 		}
@@ -150,6 +151,7 @@ void Judge( ) {
 				srand( ( unsigned int )time( NULL ) );
 				ExerciseBooks_num = rand( ) % 3;
 
+				selectedSentence = 0;
 				input = true;
 				answer = false;
 			} else {
@@ -171,9 +173,10 @@ void GameStart( ) {
 	}
 
 	//表示
-	DrawString(100, 100, "闇音", GetColor( 255, 255, 255 ) );
-	DrawString(100, 150, "PRESS ENTER KEY", GetColor( 255, 255, 255 ) );
-	if ( key[ KEY_INPUT_RETURN ] ) {
+	DrawString( SCREEN_WIDTH_CENTER - 50, SCREEN_HEIGHT_CENTER - 50, "闇音", GetColor( 255, 255, 255 ) );
+	DrawString( SCREEN_WIDTH_CENTER - 90, SCREEN_HEIGHT_CENTER, "PRESS BUTTON", GetColor( 255, 255, 255 ) );
+
+	if ( key[ KEY_INPUT_RETURN ] == 1 || joypad[ INPUT_1 ] == 1 || joypad[ INPUT_2 ] == 1 || joypad[ INPUT_3 ] == 1 || joypad[ INPUT_4 ] == 1 ) {
 		Ssound( sound[ GAME_START_BGM ] );
 		gamestatus = GAME_MAIN;
 		Initialization( );
@@ -274,7 +277,12 @@ void GameMain( ) {
 	Question( /*ExerciseBooks_num*/0, question_num );
 
 	if ( input ) {
-		KeybordCursor( );
+		JoypadCursor( );
+		/*if ( GetJoypadNum( ) ) {
+			JoypadCursor( );
+		} else {
+			KeybordCursor( );
+		}*/
 	}
 
 	if ( key[ KEY_INPUT_SPACE ] == 1 ) {
@@ -297,17 +305,17 @@ void GameResult( ) {
 
 	//描画
 	if ( player.answer_count == CLEAR ) {
-		DrawString( 100, 100, "ゲームクリア！！！", GetColor( 255, 255, 255 ) );
+		DrawString( SCREEN_WIDTH_CENTER - 50, SCREEN_HEIGHT_CENTER - 50, "ゲームクリア！！！", GetColor( 255, 255, 255 ) );
+		DrawString( SCREEN_WIDTH_CENTER - 50, SCREEN_HEIGHT_CENTER, "PRESS BUTTON", GetColor( 255, 255, 255 ) );
 		DrawGraph( 100,110, resource[ 2 ], TRUE );
 		if ( !sounded ) {
 			Psound( sound[ GAME_CLEAR ], BACK );
 			sounded = true;
 		}
 
-		DrawString( 100, 150, "PUSH SPACE", GetColor( 255, 255, 255 ) );
-		if ( key[ KEY_INPUT_SPACE ] ) {
-			Ssound( sound[ GAME_CLEAR ] );
-			gamestatus = GAME_START;
+		if ( key[ KEY_INPUT_RETURN ] == 1 || joypad[ INPUT_1 ] == 1 || joypad[ INPUT_2 ] == 1 || joypad[ INPUT_3 ] == 1 || joypad[ INPUT_4 ] == 1 ) {
+				Ssound( sound[ GAME_CLEAR ] );
+				gamestatus = GAME_START;
 			}
 
 	} else {
@@ -316,21 +324,23 @@ void GameResult( ) {
 
 		if ( gameoverWait_count >= 120 ) {
 			gameover_wait = false;
-			DrawString( 100, 100, "ゲームオーバー！！！", GetColor( 255, 0, 0 ) );
+			DrawString( SCREEN_WIDTH_CENTER - 50, SCREEN_HEIGHT_CENTER - 50, "ゲームオーバー！！！", GetColor( 255, 0, 0 ) );
+			DrawString( SCREEN_WIDTH_CENTER - 50, SCREEN_HEIGHT_CENTER, "PUSH SPACE", GetColor( 255, 255, 255 ) );
 			DrawGraph( 100, 110, resource[ 0 ], TRUE );
 
 			if ( !sounded ) {
 				Psound( sound[ GAME_OVER ], BACK );
 				sounded = true;
 			}
-
-			DrawString( 100, 150, "PUSH SPACE", GetColor( 255, 255, 255 ) );
-			if ( key[ KEY_INPUT_SPACE ] ) {
+		
+			if ( key[ KEY_INPUT_RETURN ] == 1 || joypad[ INPUT_1 ] == 1 || joypad[ INPUT_2 ] == 1 || joypad[ INPUT_3 ] == 1 || joypad[ INPUT_4 ] == 1 ) {
 				Ssound( sound[ GAME_OVER ] );
 				gamestatus = GAME_START;
 			}
-		
 		}
 
 	}
+
+
+
 }
