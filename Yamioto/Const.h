@@ -2,16 +2,19 @@
 
 const int KEY_MAX = 256;
 
-const int FIRST_DISTANCE = 20;	//playerとenemeyの初期距離	30
-const int CLEAR = 15;		//必要正解数
+const int FIRST_DISTANCE = 50;	//playerとenemeyの初期距離	30
+const int CLEAR = 10;		//必要正解数
 const int QUESTION_MAX = 20;	//最大問題数
 const int SCREEN_WIDTH_CENTER = 1280 / 2;
 const int SCREEN_HEIGHT_CENTER = 720 / 2;
-const int QUESTION_POS_X = SCREEN_WIDTH_CENTER - 300;
+const int QUESTION_POS_X = SCREEN_WIDTH_CENTER - 400;
 const int QUESTION_POS_Y = SCREEN_HEIGHT_CENTER - 200;
-const int SELECTED_POS_X = SCREEN_WIDTH_CENTER - 150;
-const int SELECTED_POS_Y = SCREEN_HEIGHT_CENTER - 100;
-
+const int CHOICES_POS_X = SCREEN_WIDTH_CENTER - 150;
+const int CHOICES_POS_Y = SCREEN_HEIGHT_CENTER - 100;
+const int CURSOR_SELECT_POS_Y = 50;
+const int QUESTION_STATEMENT_SEPARATE = 22;
+const int QUESTION_ELEMENT = 256;
+const int CHOICES_ELEMENT = 50;
 
 enum GameStatus {
 	GAME_START,
@@ -25,7 +28,7 @@ enum SoundStatus {
 	LOOP
 };
 
-enum Sound{
+enum Sound {
 	ENEMY_VOICE,
 	PLAYER_ASIOTO,
 	DOOR,
@@ -43,4 +46,16 @@ enum Way {
 	STRAIGHT_WAY,
 	RIGHT_WAY,
 	LEFT_WAY
+};
+
+enum Joypad {
+	DOWN,
+	LEFT,
+	RIGHT,
+	UP,
+	INPUT_1,
+	INPUT_2,
+	INPUT_3,
+	INPUT_4,
+	JOYPADMAX
 };

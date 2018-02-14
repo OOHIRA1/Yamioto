@@ -1,9 +1,18 @@
 #pragma once
 
-#include "Dxlib.h"
+/*
+参照しているヘッダー
+#include "DxLib.h"
+*/
+#include <stdio.h>
 
 int sound[ 20 ]; //音楽のハンドル
 int resource[ 10 ];	//画像のハンドル
+FILE* fp;
+char num[ 10 ];		//テキストファイルを見やすくするために書いた問題番号
+char questionStatement[ 3 * QUESTION_MAX ][ QUESTION_ELEMENT ];
+char choices[ 4 * QUESTION_MAX ][ CHOICES_ELEMENT ];
+int answerNum[ QUESTION_MAX ];		//正解番号
 
 void load_sound( ) {
 	SetCreate3DSoundFlag( TRUE );
@@ -27,4 +36,46 @@ void load_resource( ) {
 	resource[ 1 ] = LoadGraph( "Resource/hikari.png" );
 	resource[ 2 ] = LoadGraph( "Resource/gameclear.png" );
 	resource[ 3 ] = LoadGraph( "Resource/aka.png" );
+	resource[ 4 ] = LoadGraph( "Resource/cursor.png" );
+}
+
+
+void load_question( ) {
+	fopen_s( &fp, "Question.txt", "r" );
+	if ( fp == NULL ) {
+		DxLib_End( );
+	} else {
+		int x = 0;
+		int y = 1;
+		int z = 2;
+		int a = 0;
+		int b = 1;
+		int c = 2;
+		int d = 3;
+		int e = 0;
+		
+		while( fscanf_s( fp, "%s %s %s %s %s %s %s %s %d", num, 10, questionStatement[ x ], QUESTION_ELEMENT, questionStatement[ y ], QUESTION_ELEMENT, questionStatement[ z ], QUESTION_ELEMENT, choices[ a ], CHOICES_ELEMENT, choices[ b ], CHOICES_ELEMENT, choices[ c ], CHOICES_ELEMENT, choices[ d ], CHOICES_ELEMENT, &answerNum[ e ] ) == 9 ) { 
+			x += 3;
+			y += 3;
+			z += 3;
+			a += 4; 
+			b += 4; 
+			c += 4; 
+			d += 4;
+			e++;
+		}
+	}
+	fclose( fp );
+
+	for ( int i = 0; i < 3 * QUESTION_MAX; i++ ) {
+		if ( questionStatement[ i ][ 0 ] == '/' ) {
+			questionStatement[ i ][ 0 ] = ' ';
+			if ( questionStatement[ i ][ 1 ] != '\0' ) {
+				for ( int j = 0; j < QUESTION_ELEMENT - 1; j++ ) {
+					questionStatement[ i ][ j ] = questionStatement[ i ][ j + 1 ];
+				}
+				questionStatement[ i ][ QUESTION_ELEMENT - 1 ] = '\0';
+			}
+		}
+	}
 }

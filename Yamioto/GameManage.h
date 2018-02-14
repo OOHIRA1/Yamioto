@@ -1,6 +1,9 @@
 #pragma once
 
+/*
+参照しているヘッダー
 #include "Const.h"
+*/
 #include "Question.h"
 #include "Player.h"
 #include "Enemy.h"
@@ -18,6 +21,8 @@ bool sounded = false;
 int ExerciseBooks_num;
 int gameoverWait_count = 0;
 bool gameover_wait = true;
+
+bool debug = false;
 
 
 int x1 = SCREEN_WIDTH_CENTER, y1 = SCREEN_HEIGHT_CENTER, 
@@ -37,6 +42,7 @@ void GameResult( );
 
 struct Player player;
 struct Enemy enemy;
+
 
 void Initialization( ) {
 
@@ -69,6 +75,14 @@ void Initialization( ) {
 }
 
 
+void debugdraw( ) {
+	DrawBoxAA( enemy.position.x - 8,  (480 - (enemy.position.z + 8 )), enemy.position.x + 8, (480 - ( enemy.position.z - 8 )), GetColor( 255, 255, 255 ), TRUE );
+	DrawBoxAA( player.position.x - 8,  (480 - (player.position.z + 8 )), player.position.x + 8, (480 - ( player.position.z - 8 )), GetColor( 0, 0, 255 ), TRUE );
+
+	//残り距離を描画
+	DrawFormatString( 0, 0, GetColor( 255, 255, 255 ), "%d", distance );
+
+}
 
 
 void Judge( ) {
@@ -101,7 +115,7 @@ void Judge( ) {
 
 		if ( escape_count == 0 ) {
 			Vsound( sound[ MATIGAI ], 100 );
-			Psound( sound[ MATIGAI ], BACK );
+			Psound( sound[ MATIGAI ], NORMAL );
 			player.not_answer_count++;
 		}
 
@@ -112,9 +126,10 @@ void Judge( ) {
 			escape_count = 0;
 			question_num++;
 
-			srand( time( NULL ) );
+			srand( ( unsigned int )time( NULL ) );
 			ExerciseBooks_num = rand( ) % 3;
 
+			selectedSentence = 0;
 			input = true;
 			not_answer = false;
 		}
@@ -138,9 +153,9 @@ void Judge( ) {
 
 			
 		escape_count++;
-
+		
 		distance += escape_count % 21 / 20;
-
+		
 		player.position.z += escape_count % 21 / 20;
 		SetPlayerPosAndDir( player.position, VAdd( player.position, player.direction ) );
 		
@@ -160,9 +175,11 @@ void Judge( ) {
 				
 				question_num++;
 
-				srand( time( NULL ) );
+				srand( ( unsigned int )time( NULL ) );
 				ExerciseBooks_num = rand( ) % 3;
 
+				selectedSentence = 0;
+				input = false;
 				answer = false;
 				chooseWayFlag = true;	//道を選べるようにする
 			} else {
@@ -175,17 +192,6 @@ void Judge( ) {
 }
 
 
-
-void debugdraw( ) {
-	DrawBoxAA( enemy.position.x - 8,  (480 - (enemy.position.z + 8 )), enemy.position.x + 8, (480 - ( enemy.position.z - 8 )), GetColor( 255, 255, 255 ), TRUE );
-	DrawBoxAA( player.position.x - 8,  (480 - (player.position.z + 8 )), player.position.x + 8, (480 - ( player.position.z - 8 )), GetColor( 0, 0, 255 ), TRUE );
-
-	//残り距離を描画
-	DrawFormatString( 0, 0, GetColor( 255, 255, 255 ), "%d", distance );
-
-}
-
-
 void GameStart( ) {
 	//スタート画面ＢＧＭ
 	if ( !Csound( sound[ GAME_START_BGM ] ) ) {
@@ -194,9 +200,10 @@ void GameStart( ) {
 	}
 
 	//表示
-	DrawString(100, 100, "闇音", GetColor( 255, 255, 255 ) );
-	DrawString(100, 150, "PRESS ENTER KEY", GetColor( 255, 255, 255 ) );
-	if ( key[ KEY_INPUT_RETURN ] ) {
+	DrawString( SCREEN_WIDTH_CENTER - 50, SCREEN_HEIGHT_CENTER - 50, "闇音", GetColor( 255, 255, 255 ) );
+	DrawString( SCREEN_WIDTH_CENTER - 90, SCREEN_HEIGHT_CENTER, "PRESS BUTTON", GetColor( 255, 255, 255 ) );
+
+	if ( key[ KEY_INPUT_RETURN ] == 1 || joypad[ INPUT_1 ] == 1 || joypad[ INPUT_2 ] == 1 || joypad[ INPUT_3 ] == 1 || joypad[ INPUT_4 ] == 1 ) {
 		Ssound( sound[ GAME_START_BGM ] );
 		gamestatus = GAME_MAIN;
 		Initialization( );
@@ -300,10 +307,29 @@ void GameMain( ) {
 		question_num = 1;
 	}
 
-	Question( /*ExerciseBooks_num*/1, question_num );
-	debugdraw();
-}
+	Question( /*ExerciseBooks_num*/0, question_num );
 
+	if ( input ) {
+		JoypadCursor( );
+		/*if ( GetJoypadNum( ) ) {
+			JoypadCursor( );
+		} else {
+			KeybordCursor( );
+		}*/
+	}
+
+	if ( key[ KEY_INPUT_SPACE ] == 1 ) {
+		if ( !debug ) {
+			debug = true;
+		} else {
+			debug = false;
+		}
+	}
+
+	if ( debug ) {
+		debugdraw( );
+	}
+}
 
 void GameResult( ) {
 	Ssound( sound[ GAME_MAIN_BGM ] );
@@ -314,17 +340,17 @@ void GameResult( ) {
 
 	//描画
 	if ( player.answer_count == CLEAR ) {
-		DrawString( 100, 100, "ゲームクリア！！！", GetColor( 255, 255, 255 ) );
+		DrawString( SCREEN_WIDTH_CENTER - 50, SCREEN_HEIGHT_CENTER - 50, "ゲームクリア！！！", GetColor( 255, 255, 255 ) );
+		DrawString( SCREEN_WIDTH_CENTER - 50, SCREEN_HEIGHT_CENTER, "PRESS BUTTON", GetColor( 255, 255, 255 ) );
 		DrawGraph( 100,110, resource[ 2 ], TRUE );
 		if ( !sounded ) {
 			Psound( sound[ GAME_CLEAR ], BACK );
 			sounded = true;
 		}
 
-		DrawString( 100, 150, "PUSH SPACE", GetColor( 255, 255, 255 ) );
-		if ( key[ KEY_INPUT_SPACE ] ) {
-			Ssound( sound[ GAME_CLEAR ] );
-			gamestatus = GAME_START;
+		if ( key[ KEY_INPUT_RETURN ] == 1 || joypad[ INPUT_1 ] == 1 || joypad[ INPUT_2 ] == 1 || joypad[ INPUT_3 ] == 1 || joypad[ INPUT_4 ] == 1 ) {
+				Ssound( sound[ GAME_CLEAR ] );
+				gamestatus = GAME_START;
 			}
 
 	} else {
@@ -333,21 +359,23 @@ void GameResult( ) {
 
 		if ( gameoverWait_count >= 120 ) {
 			gameover_wait = false;
-			DrawString( 100, 100, "ゲームオーバー！！！", GetColor( 255, 0, 0 ) );
+			DrawString( SCREEN_WIDTH_CENTER - 50, SCREEN_HEIGHT_CENTER - 50, "ゲームオーバー！！！", GetColor( 255, 0, 0 ) );
+			DrawString( SCREEN_WIDTH_CENTER - 50, SCREEN_HEIGHT_CENTER, "PUSH SPACE", GetColor( 255, 255, 255 ) );
 			DrawGraph( 100, 110, resource[ 0 ], TRUE );
 
 			if ( !sounded ) {
 				Psound( sound[ GAME_OVER ], BACK );
 				sounded = true;
 			}
-
-			DrawString( 100, 150, "PUSH SPACE", GetColor( 255, 255, 255 ) );
-			if ( key[ KEY_INPUT_SPACE ] ) {
+		
+			if ( key[ KEY_INPUT_RETURN ] == 1 || joypad[ INPUT_1 ] == 1 || joypad[ INPUT_2 ] == 1 || joypad[ INPUT_3 ] == 1 || joypad[ INPUT_4 ] == 1 ) {
 				Ssound( sound[ GAME_OVER ] );
 				gamestatus = GAME_START;
 			}
-		
 		}
 
 	}
+
+
+
 }
