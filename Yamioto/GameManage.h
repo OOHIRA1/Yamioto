@@ -31,10 +31,8 @@ int x1 = SCREEN_WIDTH_CENTER, y1 = SCREEN_HEIGHT_CENTER,
 	x4 = SCREEN_WIDTH_CENTER, y4 = SCREEN_HEIGHT_CENTER;
 
 void Initialization( );
-void Judge( );
-
-
-
+void debugdraw( );
+void Action( );
 
 void GameStart( );
 void GameMain( );
@@ -76,16 +74,17 @@ void Initialization( ) {
 
 
 void debugdraw( ) {
-	DrawBoxAA( enemy.position.x - 8,  (480 - (enemy.position.z + 8 )), enemy.position.x + 8, (480 - ( enemy.position.z - 8 )), GetColor( 255, 255, 255 ), TRUE );
-	DrawBoxAA( player.position.x - 8,  (480 - (player.position.z + 8 )), player.position.x + 8, (480 - ( player.position.z - 8 )), GetColor( 0, 0, 255 ), TRUE );
+	DrawBoxAA( enemy.position.x - 8,  (480 - (enemy.position.z + 8 )), enemy.position.x + 8, (480 - ( enemy.position.z - 8 )), 0xffffff, TRUE );
+	DrawBoxAA( player.position.x - 8,  (480 - (player.position.z + 8 )), player.position.x + 8, (480 - ( player.position.z - 8 )), 0x0000ff, TRUE );
 
 	//残り距離を描画
-	DrawFormatString( 0, 0, GetColor( 255, 255, 255 ), "%d", distance );
-
+	DrawFormatString( 0, 0, 0xffffff, "エネミーとの距離：%d", distance );
+	//正解数 / 最大正解数を描画
+	DrawFormatString( 0, 20, 0xffffff, "正解数 / 最大正解数：%d / %d", player.answer_count, CLEAR );
 }
 
-
-void Judge( ) {
+//--プレイヤーの行動を表す関数
+void Action( ) {
 	if ( !chooseWayFlag && !input && !answer && !not_answer  ) {						//道を選んで問題表示してないときの処理			
 
 		//走り出す
@@ -94,19 +93,39 @@ void Judge( ) {
 			Psound( sound[ PLAYER_ASIOTO ], LOOP );
 		}
 
-			
+		switch ( way ) {
+		case STRAIGHT_WAY:
+			player.position.z += escape_count % 21 / 20;
+			break;
+
+		case RIGHT_WAY:
+			player.position.x += escape_count % 21 / 20;
+			player.direction = VGet( 1, 0, 0 );
+			SetPlayerPosAndDir( player.position, VAdd( player.position, player.direction ) );
+			break;
+
+		case LEFT_WAY:
+			player.position.x -= escape_count % 21 / 20;
+			player.direction = VGet( -1, 0, 0 );
+			SetPlayerPosAndDir( player.position, VAdd( player.position, player.direction ) );
+			break;
+		}
+
+
 		escape_count++;
 
 		distance += escape_count % 21 / 20;
 
-		player.position.z += escape_count % 21 / 20;
-		SetPlayerPosAndDir( player.position, VAdd( player.position, player.direction ) );
+		//player.position.z += escape_count % 21 / 20;
+		//SetPlayerPosAndDir( player.position, VAdd( player.position, player.direction ) );
 
 		if ( escape_count == 100 ) {
 			Ssound( sound[ PLAYER_ASIOTO ] );
 			Vsound( sound[ DOOR_GATYA ], 100 );
 			Psound( sound[ DOOR_GATYA ], NORMAL );
 			escape_count = 0;
+			player.direction = VGet( 0, 0, 1 );
+			SetPlayerPosAndDir( player.position, VAdd( player.position, player.direction ) );
 			input = true;
 		}
 	}
@@ -227,6 +246,7 @@ void GameMain( ) {
 	//距離が縮まる
 	flame_count++;
 	if ( !answer || chooseWayFlag ) {	//問題を答えていないとき または　道を選んでいないとき
+
 		switch( player.not_answer_count ) {
 		case 0:
 			distance -= flame_count % 61 / 60;
@@ -293,7 +313,7 @@ void GameMain( ) {
 
 	//問題に答えたら
 	if ( !chooseWayFlag ) {
-		Judge( );
+		Action( );
 	}
 
 	//制限時間が０になったら
@@ -364,6 +384,7 @@ void GameResult( ) {
 			DrawGraph( 100, 110, resource[ 0 ], TRUE );
 
 			if ( !sounded ) {
+				Vsound( sound[ GAME_OVER ], 100 );
 				Psound( sound[ GAME_OVER ], BACK );
 				sounded = true;
 			}

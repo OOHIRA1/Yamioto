@@ -877,11 +877,11 @@ void ChooseWay( ) {
 		chooseWayFlag = false;
 	}
 	else if ( key[ KEY_INPUT_X ] ) {
-		way = RIGHT_WAY;
+		way = LEFT_WAY;
 		chooseWayFlag = false;
 	}
 	else if ( key[ KEY_INPUT_V ] ) { 
-		way = LEFT_WAY;
+		way = RIGHT_WAY;
 		chooseWayFlag = false;
 	}
 }
