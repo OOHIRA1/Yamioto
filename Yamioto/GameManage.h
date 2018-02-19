@@ -22,6 +22,13 @@ int ExerciseBooks_num;
 int gameoverWait_count = 0;
 bool gameover_wait = true;
 
+struct fps {
+	short int start;
+	short int flame;
+	float save;
+};
+struct fps fps_counter;
+
 bool debug = false;
 
 
@@ -74,13 +81,40 @@ void Initialization( ) {
 
 
 void debugdraw( ) {
-	DrawBoxAA( enemy.position.x - 8,  (480 - (enemy.position.z + 8 )), enemy.position.x + 8, (480 - ( enemy.position.z - 8 )), 0xffffff, TRUE );
-	DrawBoxAA( player.position.x - 8,  (480 - (player.position.z + 8 )), player.position.x + 8, (480 - ( player.position.z - 8 )), 0x0000ff, TRUE );
+
+	float Ex = SCREEN_WIDTH * ( float )0.5 + enemy.position.x - 8;
+	float Px = SCREEN_WIDTH * ( float )0.5 + player.position.x - 8;
+	DrawBoxAA( Ex, ( SCREEN_HEIGHT - ( enemy.position.z + 8 ) ), Ex + 16, ( SCREEN_HEIGHT - ( enemy.position.z - 8 ) ), 0xffffff, TRUE );
+	DrawBoxAA( Px, ( SCREEN_HEIGHT - ( player.position.z + 8 ) ), Px + 16, ( SCREEN_HEIGHT - ( player.position.z - 8 ) ), 0x0000ff, TRUE );
 
 	//残り距離を描画
 	DrawFormatString( 0, 0, 0xffffff, "エネミーとの距離：%d", distance );
+
 	//正解数 / 最大正解数を描画
 	DrawFormatString( 0, 20, 0xffffff, "正解数 / 最大正解数：%d / %d", player.answer_count, CLEAR );
+
+	//q_finishedを描画
+	for ( int i = 0; i < QUESTION_MAX; i++ ) {
+		DrawFormatString( 0, ( i * 20 ) + 40, 0xffffff, "%d", q_finished[ 0 ][ i ] );
+	}
+
+	//fpsを描画
+	time_t timer;
+	struct tm local_time;
+	time( &timer );
+	localtime_s( &local_time,  &timer );
+	if ( fps_counter.start != local_time.tm_sec ) {
+		short int dif = local_time.tm_sec - fps_counter.start;
+		if ( dif < 0 ) {
+			dif += 60;
+		}
+		fps_counter.start = local_time.tm_sec;
+		fps_counter.save = fps_counter.flame / ( float )dif;
+		fps_counter.flame = 0;
+	}
+	DrawFormatString( 1000, 0, 0xffffff, "%f", fps_counter.save );
+	
+	fps_counter.flame++;
 }
 
 //--プレイヤーの行動を表す関数
@@ -143,10 +177,26 @@ void Action( ) {
 		if ( escape_count == 200 ) {
 
 			escape_count = 0;
-			question_num++;
+			
+			q_finished[ 0 ][ question_num - 1 ] = true;
 
+			//全ての問題が出たらリセットする
+			for ( int i = 0; i < QUESTION_MAX; i++ ) {
+
+				if ( !q_finished[ 0 ][ i ] ) break;
+
+				if ( i == QUESTION_MAX - 1 ) {
+					for ( int j = 0; j < QUESTION_MAX; j++ ) {
+						q_finished[ 0 ][ j ] = false;
+					}
+				}
+			}
+
+			//問題をランダムにする//問題の重複防止	
 			srand( ( unsigned int )time( NULL ) );
-			ExerciseBooks_num = rand( ) % 3;
+			do {
+				question_num = rand( ) % QUESTION_MAX + 1; 
+			} while ( q_finished[ 0 ][ question_num - 1 ] );
 
 			selectedSentence = 0;
 			input = true;
@@ -192,10 +242,26 @@ void Action( ) {
 
 			if ( player.answer_count < CLEAR ) {	//player.answer_countが必要正解数以下のとき
 				
-				question_num++;
+				q_finished[ 0 ][ question_num - 1 ] = true;
 
+				//全ての問題が出たらリセットする
+				for ( int i = 0; i < QUESTION_MAX; i++ ) {
+
+					if ( !q_finished[ 0 ][ i ] ) break;
+
+					if ( i == QUESTION_MAX - 1 ) {
+						for ( int j = 0; j < QUESTION_MAX; j++ ) {
+							q_finished[ 0 ][ j ] = false;
+						}
+					}
+				}
+
+				//問題をランダムにする//問題の重複防止	
 				srand( ( unsigned int )time( NULL ) );
-				ExerciseBooks_num = rand( ) % 3;
+				do {
+					question_num = rand( ) % QUESTION_MAX + 1; 
+				} while ( q_finished[ 0 ][ question_num - 1 ] );
+
 
 				selectedSentence = 0;
 				input = false;

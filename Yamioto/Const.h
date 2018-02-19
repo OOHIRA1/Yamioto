@@ -3,8 +3,10 @@
 const int KEY_MAX = 256;
 
 const int FIRST_DISTANCE = 50;	//playerとenemeyの初期距離	30
-const int CLEAR = 10;		//必要正解数
+const int CLEAR = 100;		//必要正解数
 const int QUESTION_MAX = 20;	//最大問題数
+const int SCREEN_WIDTH = 1280;
+const int SCREEN_HEIGHT = 720;
 const int SCREEN_WIDTH_CENTER = 1280 / 2;
 const int SCREEN_HEIGHT_CENTER = 720 / 2;
 const int QUESTION_POS_X = SCREEN_WIDTH_CENTER - 400;
@@ -58,4 +60,11 @@ enum Joypad {
 	INPUT_3,
 	INPUT_4,
 	JOYPADMAX
+};
+
+enum Difficulty {
+	EASY,
+	BASIC,
+	HARD,
+	DIFFICULTYMAX
 };
