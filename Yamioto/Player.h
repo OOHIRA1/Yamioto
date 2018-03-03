@@ -13,7 +13,7 @@ struct Player {
 };
 
 void PlayerInitialize( struct Player *player ) {
-	player->position = VGet( 0, 0, FIRST_DISTANCE - 10 );
+	player->position = VGet( 0, 0, ( float )FIRST_DISTANCE );
 	player->direction = VGet( 0, 0, 1 );
 
 	for ( int i = 0; i < 30; i++ ) {

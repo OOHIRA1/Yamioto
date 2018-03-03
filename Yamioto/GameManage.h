@@ -8,6 +8,7 @@
 #include "Player.h"
 #include "Enemy.h"
 #include <time.h>
+#include <math.h>
 
 enum GameStatus gamestatus = GAME_START;
 
@@ -15,12 +16,15 @@ int bright = 0;
 bool bright_max = true;
 
 int flame_count = 0;
-int distance = FIRST_DISTANCE - 10; //残り時間 
+int distance = FIRST_DISTANCE; //残り時間 
 int escape_count = 0;	//逃げているフレーム数を数える変数
 bool sounded = false; 
-int ExerciseBooks_num;
-int gameoverWait_count = 0;
+int exercise_books_num = 0;
+int gameover_wait_count = 0;
 bool gameover_wait = true;
+
+int p_pos_index = 0;
+int e_pos_index = 0;
 
 struct fps {
 	short int start;
@@ -32,10 +36,10 @@ struct fps fps_counter;
 bool debug = false;
 
 
-int x1 = SCREEN_WIDTH_CENTER, y1 = SCREEN_HEIGHT_CENTER, 
-	x2 = SCREEN_WIDTH_CENTER, y2 = SCREEN_HEIGHT_CENTER, 
-	x3 = SCREEN_WIDTH_CENTER, y3 = SCREEN_HEIGHT_CENTER, 
-	x4 = SCREEN_WIDTH_CENTER, y4 = SCREEN_HEIGHT_CENTER;
+int light_x1 = SCREEN_WIDTH_CENTER, light_y1 = SCREEN_HEIGHT_CENTER, 
+	light_x2 = SCREEN_WIDTH_CENTER, light_y2 = SCREEN_HEIGHT_CENTER, 
+	light_x3 = SCREEN_WIDTH_CENTER, light_y3 = SCREEN_HEIGHT_CENTER, 
+	light_x4 = SCREEN_WIDTH_CENTER, light_y4 = SCREEN_HEIGHT_CENTER;
 
 void Initialization( );
 void debugdraw( );
@@ -45,9 +49,31 @@ void GameStart( );
 void GameMain( );
 void GameResult( );
 
+VECTOR operator-( VECTOR& vecA, VECTOR& vecB );
+bool operator==( VECTOR& vec, float num );
+
 struct Player player;
 struct Enemy enemy;
 
+VECTOR operator-( VECTOR& vecA, VECTOR& vecB ) {
+	VECTOR vec;
+	vec.x = vecA.x - vecB.x;
+	vec.y = vecA.y - vecB.y;
+	vec.z = vecA.z - vecB.z;
+	return vec;
+}
+
+bool operator==( VECTOR& vec, float num ) {
+	/*if ( vec.x == num && vec.y == num && vec.z == num ) {
+		return true;
+	} else {
+		return false;
+	}*/
+
+
+	return ( vec.x == num && vec.y == num && vec.z == num );
+
+}
 
 void Initialization( ) {
 
@@ -59,19 +85,21 @@ void Initialization( ) {
 	SetRadius( 30, sound[ ENEMY_VOICE ] );
 
 	flame_count = 0;
-	distance = FIRST_DISTANCE - 10;
+	distance = FIRST_DISTANCE;
 	escape_count = 0;
-	gameoverWait_count = 0;
+	gameover_wait_count = 0;
 	bright = 0;
+	p_pos_index = 0;
+	e_pos_index = 0;
 
-	x1 = SCREEN_WIDTH_CENTER;
-	y1 = SCREEN_HEIGHT_CENTER;
-	x2 = SCREEN_WIDTH_CENTER;
-	y2 = SCREEN_HEIGHT_CENTER;
-	x3 = SCREEN_WIDTH_CENTER;
-	y3 = SCREEN_HEIGHT_CENTER;
-	x4 = SCREEN_WIDTH_CENTER;
-	y4 = SCREEN_HEIGHT_CENTER;
+	light_x1 = SCREEN_WIDTH_CENTER;
+	light_y1 = SCREEN_HEIGHT_CENTER;
+	light_x2 = SCREEN_WIDTH_CENTER;
+	light_y2 = SCREEN_HEIGHT_CENTER;
+	light_x3 = SCREEN_WIDTH_CENTER;
+	light_y3 = SCREEN_HEIGHT_CENTER;
+	light_x4 = SCREEN_WIDTH_CENTER;
+	light_y4 = SCREEN_HEIGHT_CENTER;
 
 	sounded = false;
 	gameover_wait = true;
@@ -98,7 +126,7 @@ void debugdraw( ) {
 		DrawFormatString( 0, ( i * 20 ) + 40, 0xffffff, "%d", q_finished[ 0 ][ i ] );
 	}
 
-	//fpsを描画
+	//fpsを描画--------------------------------------------------
 	time_t timer;
 	struct tm local_time;
 	time( &timer );
@@ -113,8 +141,18 @@ void debugdraw( ) {
 		fps_counter.flame = 0;
 	}
 	DrawFormatString( 1000, 0, 0xffffff, "%f", fps_counter.save );
-	
 	fps_counter.flame++;
+	//------------------------------------------------------------
+
+	//p_pos配列を描画-------------------------------------------------------------------------------------------------------------------------------------
+	for ( int i = 0; i < 30; i++ ) {
+		DrawFormatString( 50, 40 + ( i * 20 ), 0xffffff, "( %5.1f, %5.1f, %5.1f )", player.pre_pos[ i ].x, player.pre_pos[ i ].y, player.pre_pos[ i ].z );
+	}
+	//----------------------------------------------------------------------------------------------------------------------------------------------------
+
+	//e_pos_indexを描画-------------------------------------
+	DrawFormatString( 200, 0, 0xffffff, "%d", e_pos_index );
+	//------------------------------------------------------
 }
 
 //--プレイヤーの行動を表す関数
@@ -161,8 +199,19 @@ void Action( ) {
 			player.direction = VGet( 0, 0, 1 );
 			SetPlayerPosAndDir( player.position, VAdd( player.position, player.direction ) );
 			input = true;
+
+
+			//プレイヤーの座標をいれる----------------------
+			player.pre_pos[ p_pos_index ] = player.position;
+			p_pos_index = ( p_pos_index + 1 ) % 30; //数値を0～29で繰り返す
+			//----------------------------------------------
+
 		}
 	}
+	
+
+
+
 
 	if ( not_answer ) {	//不正解処理
 
@@ -230,7 +279,7 @@ void Action( ) {
 		
 		//脱出直前の画像表示
 		if ( player.answer_count == CLEAR - 1 ) {
-			DrawModiGraph( x1--, y1--, x2++, y2--, x3++, y3++, x4--, y4++, resource[ 1 ], TRUE );
+			DrawModiGraph( light_x1--, light_y1--, light_x2++, light_y2--, light_x3++, light_y3++, light_x4--, light_y4++, resource[ 1 ], TRUE );
 		}
 
 		
@@ -256,11 +305,18 @@ void Action( ) {
 					}
 				}
 
-				//問題をランダムにする//問題の重複防止	
+				//問題をランダムにする//問題の重複防止----------	
 				srand( ( unsigned int )time( NULL ) );
 				do {
 					question_num = rand( ) % QUESTION_MAX + 1; 
 				} while ( q_finished[ 0 ][ question_num - 1 ] );
+				//----------------------------------------------
+
+
+				//プレイヤーの座標をいれる----------------------
+				player.pre_pos[ p_pos_index ] = player.position;
+				p_pos_index = ( p_pos_index + 1 ) % 30; //数値を0～29で繰り返す
+				//----------------------------------------------
 
 
 				selectedSentence = 0;
@@ -309,26 +365,50 @@ void GameMain( ) {
 		Vsound( sound[ ENEMY_VOICE ], 255 );
 	}
 
-	//距離が縮まる
+	//距離が縮まる-----------------------------------------------
 	flame_count++;
 	if ( !answer || chooseWayFlag ) {	//問題を答えていないとき または　道を選んでいないとき
+		bool move_x_flag = false;
+		if ( fabsf( player.pre_pos[e_pos_index].x - enemy.position.x ) <= 0 ) {
+			move_x_flag = false;
+		} else {
+			move_x_flag = true;
+		}
+
+		if ( ( player.pre_pos[ e_pos_index ] - enemy.position ) == 0 ){
+			e_pos_index = ( e_pos_index + 1 ) % 30;
+
+		}
 
 		switch( player.not_answer_count ) {
 		case 0:
 			distance -= flame_count % 61 / 60;
-			enemy.position.z += flame_count % 61 / 60;
+			if ( move_x_flag ) {
+				enemy.position.x += flame_count % 61 / 60;
+			} else {
+				enemy.position.z += flame_count % 61 / 60;
+			}
 			break;
 		case 1:
 			distance -= flame_count % 46 / 45;
-			enemy.position.z += flame_count % 46 / 45;
+			if ( move_x_flag ) {
+				enemy.position.x += flame_count % 46 / 45;
+			} else {
+				enemy.position.z += flame_count % 46 / 45;
+			}
 			break;
 		default:
 			distance -= flame_count % 31 / 30;
-			enemy.position.z += flame_count % 31 / 30;
+			if ( move_x_flag ) {
+				enemy.position.x += flame_count % 31 / 30;
+			} else {
+				enemy.position.z += flame_count % 31 / 30;
+			}
 			break;
 		}
 		SetEnemySoundPos( enemy.position, sound[ ENEMY_VOICE ] );
 	}
+	//-----------------------------------------------------------
 
 	if ( chooseWayFlag ) {
 		ChooseWay( );
@@ -393,7 +473,7 @@ void GameMain( ) {
 		question_num = 1;
 	}
 
-	Question( /*ExerciseBooks_num*/0, question_num );
+	Question( /*exercise_books_num*/0, question_num );
 
 	if ( input ) {
 		JoypadCursor( );
@@ -441,9 +521,9 @@ void GameResult( ) {
 
 	} else {
 
-		if ( gameover_wait ) gameoverWait_count++;
+		if ( gameover_wait ) gameover_wait_count++;
 
-		if ( gameoverWait_count >= 120 ) {
+		if ( gameover_wait_count >= 120 ) {
 			gameover_wait = false;
 			DrawString( SCREEN_WIDTH_CENTER - 50, SCREEN_HEIGHT_CENTER - 50, "ゲームオーバー！！！", GetColor( 255, 0, 0 ) );
 			DrawString( SCREEN_WIDTH_CENTER - 50, SCREEN_HEIGHT_CENTER, "PUSH SPACE", GetColor( 255, 255, 255 ) );
@@ -466,3 +546,6 @@ void GameResult( ) {
 
 
 }
+
+
+
