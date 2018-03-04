@@ -17,6 +17,7 @@ const int CURSOR_SELECT_POS_Y = 50;
 const int QUESTION_STATEMENT_SEPARATE = 22;
 const int QUESTION_ELEMENT = 256;
 const int CHOICES_ELEMENT = 50;
+const int PRE_POS_MAX_INDEX = 30;
 
 enum GameStatus {
 	GAME_START,
@@ -44,10 +45,11 @@ enum Sound {
 };
 
 enum Way {
-	NON_CHOOSE_WAY,
+	NOT_CHOOSE_WAY = -1,
 	STRAIGHT_WAY,
 	RIGHT_WAY,
-	LEFT_WAY
+	LEFT_WAY,
+	WAY_MAX
 };
 
 enum Joypad {

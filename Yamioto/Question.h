@@ -1,33 +1,39 @@
 #pragma once
 
 #include "DxLib.h"
+#include <time.h>
 /*
 参照しているヘッダー
 #include "Input.h"
 #include "Load.h"
 */
 
-int question_num = 1;	//問題番号
-bool answer = true;
-bool not_answer = false;
-bool input = true;
-bool chooseWayFlag = true;
+int question_num;	//問題番号
+int exercise_books_num;	//問題集の番号
+
+bool answer;			//正解したかどうかのフラグ
+bool not_answer;		//不正解かどうかのフラグ
+bool input;				//入力を受け付けるかどうかのフラグ
+bool chooseWayFlag;		//道を選んでいるかどうかフラグ
 bool q_finished[ 3 ][ QUESTION_MAX ]; //問題集（難易度）の数と問題数 //問題が出たかどうかを判定する変数
 
-int font_handle;
-int font_handle2;
-int cr;
-int cr2;
+int font_handle;		//問題文フォントハンドル
+int font_handle2;		//選択肢フォントハンドル
+int cr;					//問題文の色
+int cr2;				//選択肢の色
 
-int selectedSentence = 0;
+int selectedSentence;	//カーソルの位置
 
-enum Way way = NON_CHOOSE_WAY;
+enum Way way;	//選んだ道
+int level[ WAY_MAX ];	//道選択時の難易度
+bool level_randamed;	//道選択時に各道にランダムで難易度を割り振ったかどうかのフラグ
 
 void QuesitionInitialize( );
 void Question( int, int );
 void Question1( int );
 void Question2( int );
 void Question3( int );
+void ChooseWay( );
 
 void changeColor( int selectedchoice, char* string, int color ) {
 	DrawFormatStringToHandle( CHOICES_POS_X, CHOICES_POS_Y + ( CURSOR_SELECT_POS_Y * selectedchoice ), color, font_handle2, string );
@@ -38,15 +44,17 @@ void changeColor( int selectedchoice, char* string, int color ) {
 //--Question.hの変数を初期化する関数
 void QuesitionInitialize( ) {
 	question_num = 1;
-	chooseWayFlag = true;
-	way = NON_CHOOSE_WAY;
+	exercise_books_num = 0;
+
 	answer = false;
 	not_answer = false;
 	input = false;
+	chooseWayFlag = true;
+	way = NOT_CHOOSE_WAY;
 	font_handle = CreateFontToHandle( "ＭＳ 明朝", 20, 5 );
 	font_handle2 = CreateFontToHandle( "ＭＳ 明朝", 20, 3 );
-	cr = GetColor( 255, 255, 255 );		//問題文の色
-	cr2 = GetColor( 255, 255, 255 );	//選択肢の色
+	cr = GetColor( 255, 255, 255 );	
+	cr2 = GetColor( 255, 255, 255 );
 
 	for ( int i = 0; i < 3; i++ ) {
 		for ( int j = 0; j < QUESTION_MAX; j++ ) {
@@ -54,6 +62,12 @@ void QuesitionInitialize( ) {
 		}
 	}
 
+	selectedSentence = 0;
+
+	for ( int i = 0; i < WAY_MAX; i++ ) {
+		level[ i ] = -1;
+	}
+	level_randamed = false;
 }
 
 ////--カーソルを表示する関数(キーボード対応)
@@ -577,6 +591,28 @@ void Question3( int num ) {
 
 //--道を選択する関数
 void ChooseWay( ) {
+	//それぞれの道に難易度を振り分ける------------------------
+	bool a[ DIFFICULTYMAX ] = { false, false, false };
+	int count = 0;
+	srand( ( unsigned int )time( NULL ) );
+
+	while( !level_randamed ){
+		
+		int difficulty = rand( ) % WAY_MAX;
+		level[ count ] = difficulty;
+
+		if ( !a[ difficulty ] ) { 
+			a[ difficulty ] = true;
+			count++;
+		}
+
+		for ( int i = 0; i < WAY_MAX; i++ ) {
+			if ( a[ i ] == false ) break;
+			if ( i == WAY_MAX - 1 ) level_randamed = true;
+		}
+	};
+	//-----------------------------------------------------------
+
 	DrawFormatStringToHandle( QUESTION_POS_X, QUESTION_POS_Y, cr, font_handle, "道を選択してください。\n" );
 	DrawFormatStringToHandle( SCREEN_WIDTH_CENTER, SCREEN_HEIGHT_CENTER, cr, font_handle2, "←：X　　↑：Z　　→：V" );
 	if ( key[ KEY_INPUT_Z ] ) { 

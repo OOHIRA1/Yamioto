@@ -12,19 +12,17 @@
 
 enum GameStatus gamestatus = GAME_START;
 
-int bright = 0;
-bool bright_max = true;
+int bright;					//点滅の透明度
+bool bright_max;			//透明度が最大になったかどうか
 
-int flame_count = 0;
-int distance = FIRST_DISTANCE; //残り時間 
-int escape_count = 0;	//逃げているフレーム数を数える変数
-bool sounded = false; 
-int exercise_books_num = 0;
-int gameover_wait_count = 0;
-bool gameover_wait = true;
+int flame_count;			//フレーム数
+int distance;				//残り距離 
+int escape_count;			//逃げているフレーム数を数える変数
+bool sounded;				//音を一回だけならすため 
+int gameover_wait_count;	//ゲームオーバーの間
 
-int p_pos_index = 0;
-int e_pos_index = 0;
+int p_pos_index;			//playerが入れるpre_posの添字番号
+int e_pos_index;			//enemyが入れるpre_posの添字番号
 
 struct fps {
 	short int start;
@@ -33,13 +31,13 @@ struct fps {
 };
 struct fps fps_counter;
 
-bool debug = false;
+bool debug = false;			//デバックモード
 
 
-int light_x1 = SCREEN_WIDTH_CENTER, light_y1 = SCREEN_HEIGHT_CENTER, 
-	light_x2 = SCREEN_WIDTH_CENTER, light_y2 = SCREEN_HEIGHT_CENTER, 
-	light_x3 = SCREEN_WIDTH_CENTER, light_y3 = SCREEN_HEIGHT_CENTER, 
-	light_x4 = SCREEN_WIDTH_CENTER, light_y4 = SCREEN_HEIGHT_CENTER;
+int light_x1, light_y1,		//クリア直前の光
+	light_x2, light_y2, 
+	light_x3, light_y3, 
+	light_x4, light_y4;
 
 void Initialization( );
 void debugdraw( );
@@ -64,15 +62,7 @@ VECTOR operator-( VECTOR& vecA, VECTOR& vecB ) {
 }
 
 bool operator==( VECTOR& vec, float num ) {
-	/*if ( vec.x == num && vec.y == num && vec.z == num ) {
-		return true;
-	} else {
-		return false;
-	}*/
-
-
 	return ( vec.x == num && vec.y == num && vec.z == num );
-
 }
 
 void Initialization( ) {
@@ -88,8 +78,11 @@ void Initialization( ) {
 	distance = FIRST_DISTANCE;
 	escape_count = 0;
 	gameover_wait_count = 0;
+
 	bright = 0;
-	p_pos_index = 0;
+	bright_max = true;
+
+	p_pos_index = 1;	//player.pre_pos[ 0 ]は最初の値を格納済み(player.pre_pos[ 0 ]を上書きしないため)
 	e_pos_index = 0;
 
 	light_x1 = SCREEN_WIDTH_CENTER;
@@ -102,9 +95,6 @@ void Initialization( ) {
 	light_y4 = SCREEN_HEIGHT_CENTER;
 
 	sounded = false;
-	gameover_wait = true;
-
-
 }
 
 
@@ -140,19 +130,27 @@ void debugdraw( ) {
 		fps_counter.save = fps_counter.flame / ( float )dif;
 		fps_counter.flame = 0;
 	}
-	DrawFormatString( 1000, 0, 0xffffff, "%f", fps_counter.save );
+	DrawFormatString( 1000, 0, 0xffffff, "fps : %f", fps_counter.save );
 	fps_counter.flame++;
 	//------------------------------------------------------------
 
 	//p_pos配列を描画-------------------------------------------------------------------------------------------------------------------------------------
-	for ( int i = 0; i < 30; i++ ) {
-		DrawFormatString( 50, 40 + ( i * 20 ), 0xffffff, "( %5.1f, %5.1f, %5.1f )", player.pre_pos[ i ].x, player.pre_pos[ i ].y, player.pre_pos[ i ].z );
+	for ( int i = 0; i < PRE_POS_MAX_INDEX; i++ ) {
+		int color = 0xffffff;
+		if ( i == e_pos_index ) {
+			color = 0xff0000;
+		}
+		DrawFormatString( 50, 40 + ( i * 20 ), color, "( %5.1f, %5.1f, %5.1f )", player.pre_pos[ i ].x, player.pre_pos[ i ].y, player.pre_pos[ i ].z );
 	}
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
 
 	//e_pos_indexを描画-------------------------------------
 	DrawFormatString( 200, 0, 0xffffff, "%d", e_pos_index );
 	//------------------------------------------------------
+
+	//enemy.positionを描画-----------------------------------------------------------------------------------------------------------------
+	DrawFormatString( 300, 0, 0xffffff, "enemy.position : ( %5.1f, %5.1f, %5.1f )", enemy.position.x, enemy.position.y, enemy.position.z );
+	//-------------------------------------------------------------------------------------------------------------------------------------
 }
 
 //--プレイヤーの行動を表す関数
@@ -203,7 +201,7 @@ void Action( ) {
 
 			//プレイヤーの座標をいれる----------------------
 			player.pre_pos[ p_pos_index ] = player.position;
-			p_pos_index = ( p_pos_index + 1 ) % 30; //数値を0～29で繰り返す
+			p_pos_index = ( p_pos_index + 1 ) % PRE_POS_MAX_INDEX; //数値を0～29で繰り返す
 			//----------------------------------------------
 
 		}
@@ -315,7 +313,7 @@ void Action( ) {
 
 				//プレイヤーの座標をいれる----------------------
 				player.pre_pos[ p_pos_index ] = player.position;
-				p_pos_index = ( p_pos_index + 1 ) % 30; //数値を0～29で繰り返す
+				p_pos_index = ( p_pos_index + 1 ) % PRE_POS_MAX_INDEX; //数値を0～29で繰り返す
 				//----------------------------------------------
 
 
@@ -368,44 +366,48 @@ void GameMain( ) {
 	//距離が縮まる-----------------------------------------------
 	flame_count++;
 	if ( !answer || chooseWayFlag ) {	//問題を答えていないとき または　道を選んでいないとき
-		bool move_x_flag = false;
-		if ( fabsf( player.pre_pos[e_pos_index].x - enemy.position.x ) <= 0 ) {
-			move_x_flag = false;
-		} else {
-			move_x_flag = true;
-		}
+		float x_diff = player.pre_pos[ e_pos_index ].x - enemy.position.x;
+		
 
 		if ( ( player.pre_pos[ e_pos_index ] - enemy.position ) == 0 ){
-			e_pos_index = ( e_pos_index + 1 ) % 30;
-
+			e_pos_index = ( e_pos_index + 1 ) % PRE_POS_MAX_INDEX;
 		}
 
 		switch( player.not_answer_count ) {
 		case 0:
 			distance -= flame_count % 61 / 60;
-			if ( move_x_flag ) {
+			if ( x_diff < 0 ) {
+				enemy.position.x -= flame_count % 61 / 60;
+			} else if ( x_diff > 0 ){
 				enemy.position.x += flame_count % 61 / 60;
 			} else {
 				enemy.position.z += flame_count % 61 / 60;
 			}
 			break;
+
 		case 1:
 			distance -= flame_count % 46 / 45;
-			if ( move_x_flag ) {
+			if ( x_diff < 0 ) {
+				enemy.position.x -= flame_count % 46 / 45;
+			} else if ( x_diff > 0 ){
 				enemy.position.x += flame_count % 46 / 45;
-			} else {
+			} else {							  
 				enemy.position.z += flame_count % 46 / 45;
 			}
 			break;
+
 		default:
 			distance -= flame_count % 31 / 30;
-			if ( move_x_flag ) {
+			if ( x_diff < 0 ) {
+				enemy.position.x -= flame_count % 31 / 30;
+			} else if ( x_diff > 0 ){
 				enemy.position.x += flame_count % 31 / 30;
-			} else {
+			} else {							  
 				enemy.position.z += flame_count % 31 / 30;
 			}
 			break;
 		}
+
 		SetEnemySoundPos( enemy.position, sound[ ENEMY_VOICE ] );
 	}
 	//-----------------------------------------------------------
@@ -521,10 +523,9 @@ void GameResult( ) {
 
 	} else {
 
-		if ( gameover_wait ) gameover_wait_count++;
+		if ( gameover_wait_count < 120 ) gameover_wait_count++;
 
 		if ( gameover_wait_count >= 120 ) {
-			gameover_wait = false;
 			DrawString( SCREEN_WIDTH_CENTER - 50, SCREEN_HEIGHT_CENTER - 50, "ゲームオーバー！！！", GetColor( 255, 0, 0 ) );
 			DrawString( SCREEN_WIDTH_CENTER - 50, SCREEN_HEIGHT_CENTER, "PUSH SPACE", GetColor( 255, 255, 255 ) );
 			DrawGraph( 100, 110, resource[ 0 ], TRUE );
