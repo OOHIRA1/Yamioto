@@ -8,7 +8,7 @@
 #include "Load.h"
 */
 
-int question_num;	//問題番号
+int question_num;		//問題番号
 int exercise_books_num;	//問題集の番号
 
 bool answer;			//正解したかどうかのフラグ
@@ -24,7 +24,7 @@ int cr2;				//選択肢の色
 
 int selectedSentence;	//カーソルの位置
 
-enum Way way;	//選んだ道
+enum Way way;			//選んだ道
 int level[ WAY_MAX ];	//道選択時の難易度
 bool level_randamed;	//道選択時に各道にランダムで難易度を割り振ったかどうかのフラグ
 
@@ -111,6 +111,8 @@ void Question( int a, int num ) {
 	}
 }
 
+
+//--QuestionEasy.txtの問題を表示する関数
 void Question1( int num ) {	
 	 cr2 = GetColor( 255, 255, 255 );
 	if ( input == true ) {
@@ -146,6 +148,8 @@ void Question1( int num ) {
 	}
 }
 
+
+//--QuestionBasic.txtの問題を表示する関数
 void Question2( int num ) {
 	cr2 = GetColor( 255, 255, 255 );
 	if ( input == true ) {
@@ -182,6 +186,7 @@ void Question2( int num ) {
 }
 
 
+//--QuestionHard.txtの問題を表示する関数
 void Question3( int num ) {
 	cr2 = GetColor( 255, 255, 255 );
 	if ( input == true ) {
@@ -218,28 +223,41 @@ void Question3( int num ) {
 }
 
 
+//--問題をランダム化する関数(問題の重複防止)
+void RandamQuestion( ) {
+	srand( ( unsigned int )time( NULL ) );
+	do {
+		question_num = rand( ) % QUESTION_MAX + 1; 
+	} while ( q_finished[ exercise_books_num ][ question_num - 1 ] );
+}
+
+
 //--道を選択する関数
 void ChooseWay( ) {
+
 	//それぞれの道に難易度を振り分ける------------------------
-	bool a[ DIFFICULTYMAX ] = { false, false, false };
-	int count = 0;
-	srand( ( unsigned int )time( NULL ) );
+	if ( !level_randamed ) {
+		bool a[ DIFFICULTYMAX ] = { false, false, false };
+		int count = 0;
+		srand( ( unsigned int )time( NULL ) );
 
-	while( !level_randamed ){
-		
-		int difficulty = rand( ) % WAY_MAX;
-		level[ count ] = difficulty;
+		while( true ){
+			
+			int difficulty = rand( ) % WAY_MAX;
+			level[ count ] = difficulty;
 
-		if ( !a[ difficulty ] ) { 
-			a[ difficulty ] = true;
-			count++;
-		}
+			if ( !a[ difficulty ] ) { 
+				a[ difficulty ] = true;
+				count++;
+			}
 
-		for ( int i = 0; i < WAY_MAX; i++ ) {
-			if ( a[ i ] == false ) break;
-			if ( i == WAY_MAX - 1 ) level_randamed = true;
-		}
-	};
+			for ( int i = 0; i < WAY_MAX; i++ ) {
+				if ( a[ i ] == false ) break;
+				if ( i == WAY_MAX - 1 ) level_randamed = true;
+			}
+			if ( level_randamed ) break;
+		};
+	}
 	//-----------------------------------------------------------
 
 	DrawFormatStringToHandle( QUESTION_POS_X, QUESTION_POS_Y, cr, font_handle, "道を選択してください。\n" );
@@ -259,10 +277,31 @@ void ChooseWay( ) {
 		way = RIGHT_WAY;
 		chooseWayFlag = false;
 	}
+
+	if ( !chooseWayFlag ) {	//道選択後に問題をランダムに選ぶ(また道選択後にChooseWay関数を呼ばないことで1フレームのみの処理にする)
+		RandamQuestion( );
+	}
+
 }
 
 
+//--問題の難易度を表示する関数
+void DisplayLevel( ) {
+	switch ( exercise_books_num ) {
+	case EASY:
+		DrawFormatStringToHandle( QUESTION_POS_X, QUESTION_POS_Y - 25, 0xffffff, font_handle, "難易度：☆" );
+		break;
+	case BASIC:
+		DrawFormatStringToHandle( QUESTION_POS_X, QUESTION_POS_Y - 25, 0xffffff, font_handle, "難易度：☆☆" );
+		break;
+	case HARD:
+		DrawFormatStringToHandle( QUESTION_POS_X, QUESTION_POS_Y - 25, 0xffffff, font_handle, "難易度：☆☆☆" );
+		break;
+	default :
+		break;
+	}
 
+} 
 
 
 

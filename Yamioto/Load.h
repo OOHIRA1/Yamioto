@@ -46,7 +46,7 @@ void load_resource( ) {
 
 void load_question( ) {
 	fopen_s( &q_load[ 0 ].fp, "QuestionEasy.txt", "r" );
-	fopen_s( &q_load[ 1 ].fp, "QuestionNormal.txt", "r" );
+	fopen_s( &q_load[ 1 ].fp, "QuestionBasic.txt", "r" );
 	fopen_s( &q_load[ 2 ].fp, "QuestionHard.txt", "r" );
 	
 	for ( int i = 0; i < DIFFICULTYMAX; i++ ) {

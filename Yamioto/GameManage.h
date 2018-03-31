@@ -211,7 +211,6 @@ void Action( ) {
 
 			input = true;																		//入力を受け付ける
 
-
 			//プレイヤーの座標をいれる-----------------------------
 			player.pre_pos[ p_pos_index ] = player.position;
 			p_pos_index = ( p_pos_index + 1 ) % PRE_POS_MAX_INDEX;								//数値を0～29で繰り返す
@@ -257,16 +256,11 @@ void Action( ) {
 			}
 			//-----------------------------------------------------------------
 
-			//問題をランダムにする//問題の重複防止-----------------------------------	
-			srand( ( unsigned int )time( NULL ) );
-			do {
-				question_num = rand( ) % QUESTION_MAX + 1; 
-			} while ( q_finished[ exercise_books_num ][ question_num - 1 ] );
+			RandamQuestion( );	//問題のランダム処理
 
 			selectedSentence = 0;
 			input = true;
 			not_answer = false;
-			//--------------------------------------------------------------------------
 
 		}
 		//------------------------------------------------------------------------------------------------------
@@ -312,7 +306,7 @@ void Action( ) {
 			player.answer_count++;
 
 			if ( player.answer_count < CLEAR ) {	//player.answer_countが必要正解数以下のとき
-				
+
 				q_finished[ exercise_books_num ][ question_num - 1 ] = true;				//出た問題にフラグを立てる
 
 				//全ての問題が出たらリセットする---------------------------------------
@@ -328,13 +322,6 @@ void Action( ) {
 				}
 				//-----------------------------------------------------------------------
 
-				//問題をランダムにする//問題の重複防止---------------------------	
-				srand( ( unsigned int )time( NULL ) );
-				do {
-					question_num = rand( ) % QUESTION_MAX + 1; 
-				} while ( q_finished[ exercise_books_num ][ question_num - 1 ] );
-				//---------------------------------------------------------------
-
 
 				//プレイヤーの座標をいれる----------------------------
 				player.pre_pos[ p_pos_index ] = player.position;
@@ -344,6 +331,7 @@ void Action( ) {
 
 				selectedSentence = 0;
 				input = false;
+				level_randamed = false;	//道に難易度を振り分けられるようにする
 				answer = false;
 				chooseWayFlag = true;	//道を選べるようにする
 			} else {
@@ -448,6 +436,12 @@ void GameMain( ) {
 	}
 	//----------------------
 
+	//問題の難易度表示--------------------------------
+	if ( !chooseWayFlag && !answer && !not_answer ) {
+		DisplayLevel( );
+	}
+	//------------------------------------------------
+
 	//時間に合わせて画面を赤くしていく------------------------------
 	int r = bright;
 	int g = bright;
@@ -504,12 +498,6 @@ void GameMain( ) {
 		gamestatus = GAME_RESULT;
 	}
 	//--------------------------------
-
-	//問題のループ------------------------
-	if ( question_num > QUESTION_MAX ) {
-		question_num = 1;
-	}
-	//-------------------------------------
 
 	//問題の出題---------------------------------
 	Question( exercise_books_num, question_num );
