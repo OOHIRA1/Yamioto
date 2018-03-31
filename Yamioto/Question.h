@@ -217,6 +217,61 @@ void Question3( int num ) {
 	}
 }
 
+
+//--道を選択する関数
+void ChooseWay( ) {
+	//それぞれの道に難易度を振り分ける------------------------
+	bool a[ DIFFICULTYMAX ] = { false, false, false };
+	int count = 0;
+	srand( ( unsigned int )time( NULL ) );
+
+	while( !level_randamed ){
+		
+		int difficulty = rand( ) % WAY_MAX;
+		level[ count ] = difficulty;
+
+		if ( !a[ difficulty ] ) { 
+			a[ difficulty ] = true;
+			count++;
+		}
+
+		for ( int i = 0; i < WAY_MAX; i++ ) {
+			if ( a[ i ] == false ) break;
+			if ( i == WAY_MAX - 1 ) level_randamed = true;
+		}
+	};
+	//-----------------------------------------------------------
+
+	DrawFormatStringToHandle( QUESTION_POS_X, QUESTION_POS_Y, cr, font_handle, "道を選択してください。\n" );
+	DrawFormatStringToHandle( SCREEN_WIDTH_CENTER, SCREEN_HEIGHT_CENTER, cr, font_handle2, "←：X　　↑：Z　　→：V" );
+	if ( key[ KEY_INPUT_Z ] ) { 
+		exercise_books_num = level[ 0 ];
+		way = STRAIGHT_WAY; 
+		chooseWayFlag = false;
+	}
+	else if ( key[ KEY_INPUT_X ] ) {
+		exercise_books_num = level[ 1 ];
+		way = LEFT_WAY;
+		chooseWayFlag = false;
+	}
+	else if ( key[ KEY_INPUT_V ] ) { 
+		exercise_books_num = level[ 2 ];
+		way = RIGHT_WAY;
+		chooseWayFlag = false;
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
 //void Question3( int num ) {
 //	switch( num ) {
 //	case 1 :
@@ -589,42 +644,3 @@ void Question3( int num ) {
 //	}
 //}
 
-//--道を選択する関数
-void ChooseWay( ) {
-	//それぞれの道に難易度を振り分ける------------------------
-	bool a[ DIFFICULTYMAX ] = { false, false, false };
-	int count = 0;
-	srand( ( unsigned int )time( NULL ) );
-
-	while( !level_randamed ){
-		
-		int difficulty = rand( ) % WAY_MAX;
-		level[ count ] = difficulty;
-
-		if ( !a[ difficulty ] ) { 
-			a[ difficulty ] = true;
-			count++;
-		}
-
-		for ( int i = 0; i < WAY_MAX; i++ ) {
-			if ( a[ i ] == false ) break;
-			if ( i == WAY_MAX - 1 ) level_randamed = true;
-		}
-	};
-	//-----------------------------------------------------------
-
-	DrawFormatStringToHandle( QUESTION_POS_X, QUESTION_POS_Y, cr, font_handle, "道を選択してください。\n" );
-	DrawFormatStringToHandle( SCREEN_WIDTH_CENTER, SCREEN_HEIGHT_CENTER, cr, font_handle2, "←：X　　↑：Z　　→：V" );
-	if ( key[ KEY_INPUT_Z ] ) { 
-		way = STRAIGHT_WAY; 
-		chooseWayFlag = false;
-	}
-	else if ( key[ KEY_INPUT_X ] ) {
-		way = LEFT_WAY;
-		chooseWayFlag = false;
-	}
-	else if ( key[ KEY_INPUT_V ] ) { 
-		way = RIGHT_WAY;
-		chooseWayFlag = false;
-	}
-}

@@ -105,16 +105,23 @@ void debugdraw( ) {
 	DrawBoxAA( Ex, ( SCREEN_HEIGHT - ( enemy.position.z + 8 ) ), Ex + 16, ( SCREEN_HEIGHT - ( enemy.position.z - 8 ) ), 0xffffff, TRUE );
 	DrawBoxAA( Px, ( SCREEN_HEIGHT - ( player.position.z + 8 ) ), Px + 16, ( SCREEN_HEIGHT - ( player.position.z - 8 ) ), 0x0000ff, TRUE );
 
-	//残り距離を描画
+	//残り距離を描画------------------------------------------------------
 	DrawFormatString( 0, 0, 0xffffff, "エネミーとの距離：%d", distance );
+	//--------------------------------------------------------------------
 
-	//正解数 / 最大正解数を描画
+	//正解数 / 最大正解数を描画---------------------------------------------------------------------
 	DrawFormatString( 0, 20, 0xffffff, "正解数 / 最大正解数：%d / %d", player.answer_count, CLEAR );
+	//----------------------------------------------------------------------------------------------
 
-	//q_finishedを描画
-	for ( int i = 0; i < QUESTION_MAX; i++ ) {
-		DrawFormatString( 0, ( i * 20 ) + 40, 0xffffff, "%d", q_finished[ 0 ][ i ] );
+	//q_finishedを描画---------------------------------------------------------------------------------
+	for ( int i = 0; i < DIFFICULTYMAX; i++ ) {
+
+		for ( int j = 0; j < QUESTION_MAX; j++ ) {
+			DrawFormatString( 0 + ( i * 20 ), ( j * 20 ) + 40, 0xffffff, "%d", q_finished[ i ][ j ] );
+		}
+
 	}
+	//-------------------------------------------------------------------------------------------------
 
 	//fpsを描画--------------------------------------------------
 	time_t timer;
@@ -155,14 +162,16 @@ void debugdraw( ) {
 
 //--プレイヤーの行動を表す関数
 void Action( ) {
-	if ( !chooseWayFlag && !input && !answer && !not_answer  ) {						//道を選んで問題表示してないときの処理			
+	if ( !chooseWayFlag && !input && !answer && !not_answer  ) {			//道を選んで問題表示してないときの処理			
 
-		//走り出す
+		//走り出す----------------------------------
 		if ( escape_count == 0 ) {
 			Vsound( sound[ PLAYER_ASIOTO ], 100 );
 			Psound( sound[ PLAYER_ASIOTO ], LOOP );
 		}
+		//------------------------------------------
 
+		//道選択時の動き----------------------------------------------------------------------
 		switch ( way ) {
 		case STRAIGHT_WAY:
 			player.position.z += escape_count % 21 / 20;
@@ -180,31 +189,36 @@ void Action( ) {
 			SetPlayerPosAndDir( player.position, VAdd( player.position, player.direction ) );
 			break;
 		}
+		//-------------------------------------------------------------------------------------
 
-
-		escape_count++;
-
-		distance += escape_count % 21 / 20;
+		
+		escape_count++;							//道を選んで走っている間
+		distance += escape_count % 21 / 20;		//走っている分距離をとる
 
 		//player.position.z += escape_count % 21 / 20;
 		//SetPlayerPosAndDir( player.position, VAdd( player.position, player.direction ) );
 
+		//走り終えたら-----------------------------------------------------------------------------
 		if ( escape_count == 100 ) {
-			Ssound( sound[ PLAYER_ASIOTO ] );
+			Ssound( sound[ PLAYER_ASIOTO ] );													//足跡を止める
 			Vsound( sound[ DOOR_GATYA ], 100 );
-			Psound( sound[ DOOR_GATYA ], NORMAL );
-			escape_count = 0;
-			player.direction = VGet( 0, 0, 1 );
+			Psound( sound[ DOOR_GATYA ], NORMAL );												//ドアの音を鳴らす
+
+			escape_count = 0;																	//カウントをリセット
+
+			player.direction = VGet( 0, 0, 1 );													//プレイヤーの向きを前にする
 			SetPlayerPosAndDir( player.position, VAdd( player.position, player.direction ) );
-			input = true;
+
+			input = true;																		//入力を受け付ける
 
 
-			//プレイヤーの座標をいれる----------------------
+			//プレイヤーの座標をいれる-----------------------------
 			player.pre_pos[ p_pos_index ] = player.position;
-			p_pos_index = ( p_pos_index + 1 ) % PRE_POS_MAX_INDEX; //数値を0～29で繰り返す
-			//----------------------------------------------
+			p_pos_index = ( p_pos_index + 1 ) % PRE_POS_MAX_INDEX;								//数値を0～29で繰り返す
+			//-----------------------------------------------------
 
 		}
+		//-----------------------------------------------------------------------------------------
 	}
 	
 
@@ -213,60 +227,70 @@ void Action( ) {
 
 	if ( not_answer ) {	//不正解処理
 
+		//不正解した最初の処理-----------------
 		if ( escape_count == 0 ) {
 			Vsound( sound[ MATIGAI ], 100 );
 			Psound( sound[ MATIGAI ], NORMAL );
 			player.not_answer_count++;
 		}
+		//-------------------------------------
 
 		escape_count++;
 
+		//ペナルティが終了したら------------------------------------------------------------------------------
 		if ( escape_count == 200 ) {
 
 			escape_count = 0;
 			
-			q_finished[ 0 ][ question_num - 1 ] = true;
+			q_finished[ exercise_books_num ][ question_num - 1 ] = true;	//出た問題にフラグを立てる
 
-			//全ての問題が出たらリセットする
+			//全ての問題が出たらリセットする-----------------------------------
 			for ( int i = 0; i < QUESTION_MAX; i++ ) {
 
-				if ( !q_finished[ 0 ][ i ] ) break;
+				if ( !q_finished[ exercise_books_num ][ i ] ) break;
 
 				if ( i == QUESTION_MAX - 1 ) {
 					for ( int j = 0; j < QUESTION_MAX; j++ ) {
-						q_finished[ 0 ][ j ] = false;
+						q_finished[ exercise_books_num ][ j ] = false;
 					}
 				}
 			}
+			//-----------------------------------------------------------------
 
-			//問題をランダムにする//問題の重複防止	
+			//問題をランダムにする//問題の重複防止-----------------------------------	
 			srand( ( unsigned int )time( NULL ) );
 			do {
 				question_num = rand( ) % QUESTION_MAX + 1; 
-			} while ( q_finished[ 0 ][ question_num - 1 ] );
+			} while ( q_finished[ exercise_books_num ][ question_num - 1 ] );
 
 			selectedSentence = 0;
 			input = true;
 			not_answer = false;
-		}
+			//--------------------------------------------------------------------------
 
+		}
+		//------------------------------------------------------------------------------------------------------
 	}
 
+
+
+
 	if ( answer ) {						//正解処理			
-		if ( escape_count == 0 && player.answer_count > -1 ) {			//正解したら最初に正解音を鳴らす。そのあとにドアの開閉音を鳴らす
+		//正解したら最初に正解音を鳴らす。そのあとにドアの開閉音を鳴らす-----------
+		if ( escape_count == 0 && player.answer_count > -1 ) {			
 			Vsound( sound[ SEIKAI ], 100 );
 			Psound( sound[ SEIKAI ], NORMAL );
 			Vsound( sound[ DOOR ], 100 );
 			Psound( sound[ DOOR ], NORMAL );
 		}
+		//-------------------------------------------------------------------------
 
-
-		//正解音とドアの開閉音が鳴り終わったら走り出す
+		//正解音とドアの開閉音が鳴り終わったら走り出す---------
 		if ( escape_count == 0 ) {
 			Vsound( sound[ PLAYER_ASIOTO ], 100 );
 			Psound( sound[ PLAYER_ASIOTO ], LOOP );
 		}
-
+		//-----------------------------------------------------
 			
 		escape_count++;
 		
@@ -275,13 +299,13 @@ void Action( ) {
 		player.position.z += escape_count % 21 / 20;
 		SetPlayerPosAndDir( player.position, VAdd( player.position, player.direction ) );
 		
-		//脱出直前の画像表示
+		//脱出直前の画像表示---------------------------------------------------------------------------------------------------------------------
 		if ( player.answer_count == CLEAR - 1 ) {
 			DrawModiGraph( light_x1--, light_y1--, light_x2++, light_y2--, light_x3++, light_y3++, light_x4--, light_y4++, resource[ 1 ], TRUE );
 		}
-
+		//---------------------------------------------------------------------------------------------------------------------------------------
 		
-
+		//走り終わったら-------------------------------------------------------------------------
 		if ( escape_count == 200 ) {
 			Ssound( sound[ PLAYER_ASIOTO ] );
 			escape_count = 0;
@@ -289,32 +313,33 @@ void Action( ) {
 
 			if ( player.answer_count < CLEAR ) {	//player.answer_countが必要正解数以下のとき
 				
-				q_finished[ 0 ][ question_num - 1 ] = true;
+				q_finished[ exercise_books_num ][ question_num - 1 ] = true;				//出た問題にフラグを立てる
 
-				//全ての問題が出たらリセットする
+				//全ての問題が出たらリセットする---------------------------------------
 				for ( int i = 0; i < QUESTION_MAX; i++ ) {
 
-					if ( !q_finished[ 0 ][ i ] ) break;
+					if ( !q_finished[ exercise_books_num ][ i ] ) break;
 
 					if ( i == QUESTION_MAX - 1 ) {
 						for ( int j = 0; j < QUESTION_MAX; j++ ) {
-							q_finished[ 0 ][ j ] = false;
+							q_finished[ exercise_books_num ][ j ] = false;
 						}
 					}
 				}
+				//-----------------------------------------------------------------------
 
-				//問題をランダムにする//問題の重複防止----------	
+				//問題をランダムにする//問題の重複防止---------------------------	
 				srand( ( unsigned int )time( NULL ) );
 				do {
 					question_num = rand( ) % QUESTION_MAX + 1; 
-				} while ( q_finished[ 0 ][ question_num - 1 ] );
-				//----------------------------------------------
+				} while ( q_finished[ exercise_books_num ][ question_num - 1 ] );
+				//---------------------------------------------------------------
 
 
-				//プレイヤーの座標をいれる----------------------
+				//プレイヤーの座標をいれる----------------------------
 				player.pre_pos[ p_pos_index ] = player.position;
 				p_pos_index = ( p_pos_index + 1 ) % PRE_POS_MAX_INDEX; //数値を0～29で繰り返す
-				//----------------------------------------------
+				//----------------------------------------------------
 
 
 				selectedSentence = 0;
@@ -324,46 +349,51 @@ void Action( ) {
 			} else {
 				gamestatus = GAME_RESULT;
 			}
-
+			
 		}
-
+		//-------------------------------------------------------------------------------------------------------------------------------------
 	}
 }
 
 
 void GameStart( ) {
-	//スタート画面ＢＧＭ
+	//スタート画面ＢＧＭ-----------------------------
 	if ( !Csound( sound[ GAME_START_BGM ] ) ) {
 		Vsound( sound[ GAME_START_BGM ], 100 );
 		Psound( sound[ GAME_START_BGM ], LOOP );
 	}
+	//-----------------------------------------------
 
-	//表示
+	//タイトル表示-------------------------------------------------------------------------------------------
 	DrawString( SCREEN_WIDTH_CENTER - 50, SCREEN_HEIGHT_CENTER - 50, "闇音", GetColor( 255, 255, 255 ) );
 	DrawString( SCREEN_WIDTH_CENTER - 90, SCREEN_HEIGHT_CENTER, "PRESS BUTTON", GetColor( 255, 255, 255 ) );
+	//-------------------------------------------------------------------------------------------------------
 
+	//-------------------------------------------------------------------------------------------------------------------------------------------
 	if ( key[ KEY_INPUT_RETURN ] == 1 || joypad[ INPUT_1 ] == 1 || joypad[ INPUT_2 ] == 1 || joypad[ INPUT_3 ] == 1 || joypad[ INPUT_4 ] == 1 ) {
 		Ssound( sound[ GAME_START_BGM ] );
 		gamestatus = GAME_MAIN;
 		Initialization( );
 	}
-		
+	//-------------------------------------------------------------------------------------------------------------------------------------------
 }
 
 void GameMain( ) {
-	//ゲームメインＢＧＭ
+	//ゲームメインＢＧＭ-----------------------
 	if ( !Csound( sound[ GAME_MAIN_BGM ] ) ) {
 		Vsound( sound[ GAME_MAIN_BGM ], 100 );
 		Psound( sound[ GAME_MAIN_BGM ], LOOP );
 	}
+	//-----------------------------------------
 
-	//初期歌声
+	//初期歌声-----------------------------------
 	if ( !Csound( sound[ ENEMY_VOICE ] ) ) {
 		Psound( sound[ ENEMY_VOICE ], LOOP );
 		Vsound( sound[ ENEMY_VOICE ], 255 );
 	}
+	//-------------------------------------------
 
-	//距離が縮まる-----------------------------------------------
+	//距離が縮まる-------------------------------------------------------------------
 	flame_count++;
 	if ( !answer || chooseWayFlag ) {	//問題を答えていないとき または　道を選んでいないとき
 		float x_diff = player.pre_pos[ e_pos_index ].x - enemy.position.x;
@@ -410,14 +440,15 @@ void GameMain( ) {
 
 		SetEnemySoundPos( enemy.position, sound[ ENEMY_VOICE ] );
 	}
-	//-----------------------------------------------------------
+	//----------------------------------------------------------------------------------
 
+	//道選択---------------
 	if ( chooseWayFlag ) {
 		ChooseWay( );
 	}
+	//----------------------
 
-
-	//時間に合わせて画面を赤くしていく
+	//時間に合わせて画面を赤くしていく------------------------------
 	int r = bright;
 	int g = bright;
 	int b = bright;
@@ -453,30 +484,38 @@ void GameMain( ) {
 		}
 
 	}
+	//----------------------------------------------------------------
 
-	//画面を赤くするやつ描画
+
+	//画面を赤くするやつ描画------------------
 	SetDrawBright( r, g, b );
 	DrawGraph( 0, 0, resource[ 3 ], TRUE );
 	SetDrawBright( 255, 255, 255 );							
+	//----------------------------------------
 
-	//問題に答えたら
+	//問題に答えたら------------
 	if ( !chooseWayFlag ) {
 		Action( );
 	}
+	//--------------------------
 
-	//制限時間が０になったら
+	//制限時間が０になったら----------
 	if ( distance == 0 ) {
 		gamestatus = GAME_RESULT;
 	}
-	
+	//--------------------------------
 
-	//問題のループ
+	//問題のループ------------------------
 	if ( question_num > QUESTION_MAX ) {
 		question_num = 1;
 	}
+	//-------------------------------------
 
-	Question( /*exercise_books_num*/0, question_num );
+	//問題の出題---------------------------------
+	Question( exercise_books_num, question_num );
+	//-------------------------------------------
 
+	//入力受付//--------------------------------
 	if ( input ) {
 		JoypadCursor( );
 		/*if ( GetJoypadNum( ) ) {
@@ -485,7 +524,12 @@ void GameMain( ) {
 			KeybordCursor( );
 		}*/
 	}
+	//------------------------------------------
 
+
+
+
+	//デバックモード------------------------------
 	if ( key[ KEY_INPUT_SPACE ] == 1 ) {
 		if ( !debug ) {
 			debug = true;
@@ -497,17 +541,21 @@ void GameMain( ) {
 	if ( debug ) {
 		debugdraw( );
 	}
+	//-----------------------------------------------
 }
 
 void GameResult( ) {
+	//メインBGMと足音と敵の歌声を止める(あとで統一)
 	Ssound( sound[ GAME_MAIN_BGM ] );
 	Ssound( sound[ ENEMY_VOICE ] );
 	if ( Csound( sound[ PLAYER_ASIOTO ] ) ) {
 		Ssound( sound[ PLAYER_ASIOTO ] );
 	}
+	//----------------------------------------
 
-	//描画
-	if ( player.answer_count == CLEAR ) {
+	//リザルト描画-------------------------------------------------------------------------------------------------------------------------------------------------
+	if ( player.answer_count == CLEAR ) {	
+		//クリア時
 		DrawString( SCREEN_WIDTH_CENTER - 50, SCREEN_HEIGHT_CENTER - 50, "ゲームクリア！！！", GetColor( 255, 255, 255 ) );
 		DrawString( SCREEN_WIDTH_CENTER - 50, SCREEN_HEIGHT_CENTER, "PRESS BUTTON", GetColor( 255, 255, 255 ) );
 		DrawGraph( 100,110, resource[ 2 ], TRUE );
@@ -522,8 +570,8 @@ void GameResult( ) {
 			}
 
 	} else {
-
-		if ( gameover_wait_count < 120 ) gameover_wait_count++;
+		//ゲームオーバー時
+		if ( gameover_wait_count < 120 ) gameover_wait_count++; //ゲームオーバーの間
 
 		if ( gameover_wait_count >= 120 ) {
 			DrawString( SCREEN_WIDTH_CENTER - 50, SCREEN_HEIGHT_CENTER - 50, "ゲームオーバー！！！", GetColor( 255, 0, 0 ) );
@@ -543,7 +591,7 @@ void GameResult( ) {
 		}
 
 	}
-
+	//------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 }

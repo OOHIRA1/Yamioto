@@ -8,7 +8,7 @@ struct Player {
 	VECTOR position;
 	VECTOR direction;
 	VECTOR pre_pos[ PRE_POS_MAX_INDEX ];	//プレイヤーがいた座標（道選択時の座標）を記憶する配列
-	int answer_count;	//正解数	//最初にanswerをtureで処理するため-1で初期化
+	int answer_count;	//正解数	//最初にanswerをtureで処理するため-1で初期化※道選択実装前
 	int not_answer_count; //不正解数
 };
 

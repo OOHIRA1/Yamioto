@@ -3,7 +3,7 @@
 const int KEY_MAX = 256;
 
 const int FIRST_DISTANCE = 50;	//playerとenemeyの初期距離	30
-const int CLEAR = 100;		//必要正解数
+const int CLEAR = 6;		//必要正解数
 const int QUESTION_MAX = 20;	//最大問題数
 const int SCREEN_WIDTH = 1280;
 const int SCREEN_HEIGHT = 720;
