@@ -34,35 +34,41 @@ struct fps {
 	short int flame;
 	float save;
 };
-struct fps fps_counter;
-
+struct fps fps_counter;		//fps表示用構造体
 bool debug = false;			//デバックモード
 
 
-int leftUp_light_x,    leftUp_light_y,		//クリア直前の光
+int leftUp_light_x,    leftUp_light_y,		//クリア直前の光画像の座標
 	rightUp_light_x,   rightUp_light_y, 
 	rightDown_light_x, rightDown_light_y, 
 	leftDown_light_x,  leftDown_light_y;
 
-int enemy_picture_leftUp_x,  enemy_picture_leftUp_y,
-	enemy_picture_rightUp_x, enemy_picture_rightUp_y;
-
-void Initialization( );
-void debugdraw( );
-void Action( );
-void FlashGraph( int x, int y, int handle );	//画像を点滅する関数
-void FadeOut( );								//フェードアウトする関数
-
-void GameStart( );
-void GameMain( );
-void GameResult( );
-
-VECTOR operator-( VECTOR& vecA, VECTOR& vecB );
-bool operator==( VECTOR& vec, float num );
+int enemy_picture_leftUp_x,  enemy_picture_leftUp_y,		//エネミーの画像の座標
+	enemy_picture_rightDown_x, enemy_picture_rightDown_y;
 
 struct Player player;
 struct Enemy enemy;
 
+//関数原型宣言=======================================================================
+void Initialization( );							//各変数を初期化する関数
+void debugdraw( );								//デバッグモード表示をする関数
+void Action( );									//--プレイヤーの行動を表す関数
+void FlashGraph( int x, int y, int handle );	//画像を点滅する関数
+void FadeOut( );								//フェードアウトする関数
+
+void GameStart( );								//タイトルシーンの処理
+void GameMain( );								//ゲームメインシーンの処理
+void GameResult( );								//ゲームリザルトシーンの処理
+//===================================================================================
+
+//オペレーター=======================================================================
+VECTOR operator-( VECTOR& vecA, VECTOR& vecB );	//ベクトルの差
+bool operator==( VECTOR& vec, float num );		//二つの座標が等しいかどうか確かめるのに使うオペレーター
+//===================================================================================
+
+
+
+//--ベクトルの差
 VECTOR operator-( VECTOR& vecA, VECTOR& vecB ) {
 	VECTOR vec;
 	vec.x = vecA.x - vecB.x;
@@ -71,10 +77,14 @@ VECTOR operator-( VECTOR& vecA, VECTOR& vecB ) {
 	return vec;
 }
 
+
+//--二つの座標が等しいかどうか確かめるのに使うオペレーター
 bool operator==( VECTOR& vec, float num ) {
 	return ( vec.x == num && vec.y == num && vec.z == num );
 }
 
+
+//--各変数を初期化する関数
 void Initialization( ) {
 
 	PlayerInitialize( &player );
@@ -111,11 +121,12 @@ void Initialization( ) {
 
 	enemy_picture_leftUp_x = SCREEN_WIDTH_CENTER;
 	enemy_picture_leftUp_y = SCREEN_HEIGHT_CENTER;
-	enemy_picture_rightUp_x = SCREEN_WIDTH_CENTER;
-	enemy_picture_rightUp_y = SCREEN_HEIGHT_CENTER;
+	enemy_picture_rightDown_x = SCREEN_WIDTH_CENTER;
+	enemy_picture_rightDown_y = SCREEN_HEIGHT_CENTER;
 }
 
 
+//--デバッグモード表示をする関数
 void debugdraw( ) {
 
 	float Ex = SCREEN_WIDTH * ( float )0.5 + enemy.position.x - 8;
@@ -184,9 +195,11 @@ void debugdraw( ) {
 	//-------------------------------------------------------------------------------------------------------------------------------------
 }
 
+
 //--プレイヤーの行動を表す関数
 void Action( ) {
-	if ( !chooseWayFlag && !input && !answer && !not_answer  ) {			//道を選んで問題表示してないときの処理			
+	//道を選んで問題表示してないときの処理---------------------------------------------------------------------------------
+	if ( !chooseWayFlag && !input && !answer && !not_answer  ) {	
 
 		//走り出す----------------------------------
 		if ( escape_count == 0 ) {
@@ -194,6 +207,8 @@ void Action( ) {
 			Psound( sound[ PLAYER_ASIOTO ], LOOP );
 		}
 		//------------------------------------------
+
+		escape_count++;		//道を選んで走っている間
 
 		//道選択時の動き----------------------------------------------------------------------
 		switch ( way ) {
@@ -214,9 +229,6 @@ void Action( ) {
 			break;
 		}
 		//-------------------------------------------------------------------------------------
-
-		
-		escape_count++;							//道を選んで走っている間
 
 		//走り終えたら-----------------------------------------------------------------------------
 		if ( escape_count == 200 ) {
@@ -239,12 +251,11 @@ void Action( ) {
 		}
 		//-----------------------------------------------------------------------------------------
 	}
-	
+	//---------------------------------------------------------------------------------------------------------------------
 
 
-
-
-	if ( not_answer ) {	//不正解処理
+	//不正解処理-----------------------------------------------------------------------------------------------------------
+	if ( not_answer ) {
 
 		//不正解した最初の処理-----------------
 		if ( escape_count == 0 ) {
@@ -285,11 +296,11 @@ void Action( ) {
 		}
 		//------------------------------------------------------------------------------------------------------
 	}
+	//---------------------------------------------------------------------------------------------------------------------
 
 
-
-
-	if ( answer ) {						//正解処理			
+	//正解処理-------------------------------------------------------------------------------------------------------------
+	if ( answer ) {
 		//正解したら最初に正解音を鳴らす。そのあとにドアの開閉音を鳴らす-----------
 		if ( escape_count == 0 && player.answer_count > -1 ) {			
 			Vsound( sound[ SEIKAI ], 100 );
@@ -369,6 +380,7 @@ void Action( ) {
 		}
 		//-------------------------------------------------------------------------------------------------------------------------------------
 	}
+	//---------------------------------------------------------------------------------------------------------------------
 }
 
 
@@ -397,6 +409,8 @@ void FadeOut( ) {
 	SetDrawBlendMode( DX_BLENDMODE_ALPHA, alpha );
 }
 
+
+//--タイトルシーンの処理
 void GameStart( ) {
 	if ( !initialized ) {
 		Initialization( );
@@ -450,6 +464,8 @@ void GameStart( ) {
 
 }
 
+
+//--ゲームメインシーンの処理
 void GameMain( ) {
 	//ゲームメインＢＧＭ-----------------------
 	if ( !Csound( sound[ GAME_MAIN_BGM ] ) ) {
@@ -612,6 +628,8 @@ void GameMain( ) {
 	//-----------------------------------------------
 }
 
+
+//--ゲームリザルトシーンの処理
 void GameResult( ) {
 	//メインBGMと足音と敵の歌声を止める-------
 	Ssound( sound[ GAME_MAIN_BGM ] );
@@ -665,13 +683,13 @@ void GameResult( ) {
 
 		if ( gameover_wait_count >= 120 ) {
 			//エネミーが近づく処理------------------------------------------------------------------------------------------------------------------
-			DrawExtendGraph( enemy_picture_leftUp_x, enemy_picture_leftUp_y,enemy_picture_rightUp_x,enemy_picture_rightUp_y, resource[ 0 ], TRUE );
+			DrawExtendGraph( enemy_picture_leftUp_x, enemy_picture_leftUp_y,enemy_picture_rightDown_x,enemy_picture_rightDown_y, resource[ 0 ], TRUE );
 
 			if ( enemy_picture_leftUp_x > 100  ) { 
 				enemy_picture_leftUp_x -= 40;
 				enemy_picture_leftUp_y -= 40;
-				enemy_picture_rightUp_x += 40;
-				enemy_picture_rightUp_y += 40;
+				enemy_picture_rightDown_x += 40;
+				enemy_picture_rightDown_y += 40;
 			}
 			//---------------------------------------------------------------------------------------------------------------------------------------
 			
@@ -711,6 +729,3 @@ void GameResult( ) {
 		}
 	}	
 }
-
-
-
