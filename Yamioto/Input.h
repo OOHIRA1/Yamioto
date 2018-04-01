@@ -6,6 +6,8 @@
 int key[ KEY_MAX ];
 int joypad[ JOYPADMAX ];
 
+
+//キーボードを操作したかどうかを確認する関数
 int updatekey( ) {
 	char key_c[ KEY_MAX ];
 	GetHitKeyStateAll( key_c );
@@ -21,6 +23,8 @@ int updatekey( ) {
 	return 0;
 }
 
+
+//ジョイパット操作をしたかどうかを確認する関数
 int updateJoypad( ) {
 	int pad[ JOYPADMAX ] = { 
 		PAD_INPUT_DOWN, 
@@ -43,6 +47,8 @@ int updateJoypad( ) {
 	return 0;
 }
 
+
+//キーボードまたはジョイパットを操作したか確認する関数
 void updateDevice( ) {
 	updatekey( );
 	updateJoypad( );
