@@ -3,7 +3,7 @@
 const int KEY_MAX = 256;
 
 const int FIRST_DISTANCE = 100;	//playerとenemeyの初期距離
-const int CLEAR = 100;		//必要正解数
+const int CLEAR = 1;			//必要正解数
 const int QUESTION_MAX = 20;	//最大問題数
 const int SCREEN_WIDTH = 1280;
 const int SCREEN_HEIGHT = 720;
@@ -18,6 +18,8 @@ const int QUESTION_STATEMENT_SEPARATE = 22;
 const int QUESTION_ELEMENT = 256;
 const int CHOICES_ELEMENT = 100;
 const int PRE_POS_MAX_INDEX = 30;
+const int RATE_X = SCREEN_WIDTH_CENTER / 150;
+const int RATE_Y = SCREEN_HEIGHT_CENTER / 150;
 
 enum GameStatus {
 	GAME_START,
@@ -41,7 +43,8 @@ enum Sound {
 	GAME_CLEAR,
 	GAME_OVER,
 	GAME_START_BGM,
-	GAME_MAIN_BGM
+	GAME_MAIN_BGM,
+	GAME_START_SE
 };
 
 enum Way {

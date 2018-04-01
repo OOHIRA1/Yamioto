@@ -12,17 +12,22 @@
 
 enum GameStatus gamestatus = GAME_START;
 
+bool initialized = false;			//初期化を一回だけ行うため
+
 int bright;					//点滅の透明度
 bool bright_max;			//透明度が最大になったかどうか
 
 int flame_count;			//フレーム数
 int distance;				//残り距離 
 int escape_count;			//逃げているフレーム数を数える変数
-bool sounded;				//音を一回だけならすため 
+bool sounded;				//音を一回だけならすため
 int gameover_wait_count;	//ゲームオーバーの間
 
 int p_pos_index;			//playerが入れるpre_posの添字番号
 int e_pos_index;			//enemyが入れるpre_posの添字番号
+
+int whited;					//スタート画面の文字の白さ
+bool pushed;				//キーを押したかどうか
 
 struct fps {
 	short int start;
@@ -34,10 +39,10 @@ struct fps fps_counter;
 bool debug = false;			//デバックモード
 
 
-int light_x1, light_y1,		//クリア直前の光
-	light_x2, light_y2, 
-	light_x3, light_y3, 
-	light_x4, light_y4;
+int leftUp_light_x, leftUp_light_y,		//クリア直前の光
+	rightUp_light_x, rightUp_light_y, 
+	rightDown_light_x, rightDown_light_y, 
+	leftDown_light_x, leftDown_light_y;
 
 void Initialization( );
 void debugdraw( );
@@ -85,16 +90,19 @@ void Initialization( ) {
 	p_pos_index = 1;	//player.pre_pos[ 0 ]は最初の値を格納済み(player.pre_pos[ 0 ]を上書きしないため)
 	e_pos_index = 0;
 
-	light_x1 = SCREEN_WIDTH_CENTER;
-	light_y1 = SCREEN_HEIGHT_CENTER;
-	light_x2 = SCREEN_WIDTH_CENTER;
-	light_y2 = SCREEN_HEIGHT_CENTER;
-	light_x3 = SCREEN_WIDTH_CENTER;
-	light_y3 = SCREEN_HEIGHT_CENTER;
-	light_x4 = SCREEN_WIDTH_CENTER;
-	light_y4 = SCREEN_HEIGHT_CENTER;
+	leftUp_light_x = SCREEN_WIDTH_CENTER;
+	leftUp_light_y = SCREEN_HEIGHT_CENTER;
+	rightUp_light_x = SCREEN_WIDTH_CENTER;
+	rightUp_light_y = SCREEN_HEIGHT_CENTER;
+	rightDown_light_x = SCREEN_WIDTH_CENTER;
+	rightDown_light_y = SCREEN_HEIGHT_CENTER;
+	leftDown_light_x = SCREEN_WIDTH_CENTER;
+	leftDown_light_y = SCREEN_HEIGHT_CENTER;
 
 	sounded = false;
+
+	whited = 255;
+	pushed = false;
 }
 
 
@@ -293,11 +301,19 @@ void Action( ) {
 		player.position.z += escape_count % 21 / 20;
 		SetPlayerPosAndDir( player.position, VAdd( player.position, player.direction ) );
 		
+
 		//脱出直前の画像表示---------------------------------------------------------------------------------------------------------------------
 		if ( player.answer_count == CLEAR - 1 ) {
-			DrawModiGraph( light_x1--, light_y1--, light_x2++, light_y2--, light_x3++, light_y3++, light_x4--, light_y4++, resource[ 1 ], TRUE );
+			DrawModiGraph(	leftUp_light_x    -= RATE_X, leftUp_light_y    -= RATE_Y, 
+							rightUp_light_x   += RATE_X, rightUp_light_y   -= RATE_Y, 
+							rightDown_light_x += RATE_X, rightDown_light_y += RATE_Y,	
+							leftDown_light_x  -= RATE_X, leftDown_light_y  += RATE_Y,
+							resource[ 1 ], TRUE );
 		}
 		//---------------------------------------------------------------------------------------------------------------------------------------
+
+
+		
 		
 		//走り終わったら-------------------------------------------------------------------------
 		if ( escape_count == 200 ) {
@@ -323,6 +339,8 @@ void Action( ) {
 				//-----------------------------------------------------------------------
 
 
+				
+
 				//プレイヤーの座標をいれる----------------------------
 				player.pre_pos[ p_pos_index ] = player.position;
 				p_pos_index = ( p_pos_index + 1 ) % PRE_POS_MAX_INDEX; //数値を0～29で繰り返す
@@ -345,25 +363,51 @@ void Action( ) {
 
 
 void GameStart( ) {
+	if ( !initialized ) {
+		Initialization( );
+		initialized = true;
+	}
+
+
 	//スタート画面ＢＧＭ-----------------------------
-	if ( !Csound( sound[ GAME_START_BGM ] ) ) {
+	if ( !Csound( sound[ GAME_START_BGM ] ) && !sounded ) {
 		Vsound( sound[ GAME_START_BGM ], 100 );
 		Psound( sound[ GAME_START_BGM ], LOOP );
+		sounded = true;
 	}
 	//-----------------------------------------------
 
 	//タイトル表示-------------------------------------------------------------------------------------------
-	DrawString( SCREEN_WIDTH_CENTER - 50, SCREEN_HEIGHT_CENTER - 50, "闇音", GetColor( 255, 255, 255 ) );
-	DrawString( SCREEN_WIDTH_CENTER - 90, SCREEN_HEIGHT_CENTER, "PRESS BUTTON", GetColor( 255, 255, 255 ) );
+	DrawString( SCREEN_WIDTH_CENTER - 50, SCREEN_HEIGHT_CENTER - 50, "闇音", GetColor( whited, whited, whited ) );
+	DrawString( SCREEN_WIDTH_CENTER - 90, SCREEN_HEIGHT_CENTER, "PRESS BUTTON", GetColor( whited, whited, whited ) );
 	//-------------------------------------------------------------------------------------------------------
 
-	//-------------------------------------------------------------------------------------------------------------------------------------------
+	//キー受付-------------------------------------------------------------------------------------------------------------------------------------------
 	if ( key[ KEY_INPUT_RETURN ] == 1 || joypad[ INPUT_1 ] == 1 || joypad[ INPUT_2 ] == 1 || joypad[ INPUT_3 ] == 1 || joypad[ INPUT_4 ] == 1 ) {
 		Ssound( sound[ GAME_START_BGM ] );
-		gamestatus = GAME_MAIN;
-		Initialization( );
+		Vsound( sound[ GAME_START_SE ], 80 );
+		Psound( sound[ GAME_START_SE ], BACK );
+		pushed = true;
+		
 	}
 	//-------------------------------------------------------------------------------------------------------------------------------------------
+
+	//キー入力後の処理------------------
+	if ( pushed ) {
+		if ( whited > 0 ) whited -= 2;
+		if ( whited < 0 ) whited = 0;
+		
+
+		if ( whited <= 0 ) {
+			Ssound( sound[ GAME_START_SE ] );
+			gamestatus = GAME_MAIN;
+			initialized = false;
+			sounded = false;		//GameResultにも使用するためfalseに戻す
+		}
+
+	}
+	//----------------------------------
+
 }
 
 void GameMain( ) {
@@ -513,8 +557,6 @@ void GameMain( ) {
 	//------------------------------------------
 
 
-
-
 	//デバックモード------------------------------
 	if ( key[ KEY_INPUT_SPACE ] == 1 ) {
 		if ( !debug ) {
@@ -542,9 +584,8 @@ void GameResult( ) {
 	//リザルト描画-------------------------------------------------------------------------------------------------------------------------------------------------
 	if ( player.answer_count == CLEAR ) {	
 		//クリア時
-		DrawString( SCREEN_WIDTH_CENTER - 50, SCREEN_HEIGHT_CENTER - 50, "ゲームクリア！！！", GetColor( 255, 255, 255 ) );
-		DrawString( SCREEN_WIDTH_CENTER - 50, SCREEN_HEIGHT_CENTER, "PRESS BUTTON", GetColor( 255, 255, 255 ) );
-		DrawGraph( 100,110, resource[ 2 ], TRUE );
+		DrawGraph( SCREEN_WIDTH_CENTER - 150, SCREEN_HEIGHT_CENTER - 40, resource[ 2 ], TRUE );
+		DrawString( SCREEN_WIDTH_CENTER - 50, SCREEN_HEIGHT_CENTER + 50, "PRESS BUTTON", GetColor( 255, 255, 255 ) );
 		if ( !sounded ) {
 			Psound( sound[ GAME_CLEAR ], BACK );
 			sounded = true;

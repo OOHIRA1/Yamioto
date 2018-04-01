@@ -33,12 +33,13 @@ void load_sound( ) {
 	sound[ GAME_OVER      ] = LoadSoundMem( "Sound/GameOver.wav" );
 	sound[ GAME_START_BGM ] = LoadSoundMem( "Sound/GameStart.wav" );
 	sound[ GAME_MAIN_BGM  ] = LoadSoundMem( "Sound/GameMain.wav" );
+	sound[ GAME_START_SE  ] = LoadSoundMem( "Sound/GameStartSE.wav" );
 } 
 
 void load_resource( ) {
 	resource[ 0 ] = LoadGraph( "Resource/gameover.png" );
 	resource[ 1 ] = LoadGraph( "Resource/hikari.png" );
-	resource[ 2 ] = LoadGraph( "Resource/gameclear.png" );
+	resource[ 2 ] = LoadGraph( "Resource/GAME-CLEAR-.png" );
 	resource[ 3 ] = LoadGraph( "Resource/aka.png" );
 	resource[ 4 ] = LoadGraph( "Resource/cursor.png" );
 }

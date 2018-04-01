@@ -11,11 +11,11 @@
 
 int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdshow ) {
 	SetWindowText( "闇音" );
-	SetOneMeter( 0.2 );
+	SetOneMeter( 0.2f );
 	ChangeWindowMode( TRUE );
 	SetAlwaysRunFlag( TRUE );	//別のウィンドウに切り替えても処理が継続される関数
-	SetWindowSize( 1280, 720 );
-	SetGraphMode( 1280, 720, 32 );	//画像の解像度を設定する関数
+	SetWindowSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+	SetGraphMode( SCREEN_WIDTH, SCREEN_HEIGHT, 32 );	//画像の解像度を設定する関数
 	SetEnableXAudioFlag( TRUE );	//サウンドの再生にXAudio2を使用するかどうかを設定する
 	if ( DxLib_Init( ) != 0 ) {
 		return -1;
