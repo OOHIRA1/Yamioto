@@ -16,6 +16,7 @@ bool initialized = false;			//初期化を一回だけ行うため
 
 int bright;					//点滅の透明度
 bool bright_max;			//透明度が最大になったかどうか
+//int alpha;					//画像の透明度
 
 int flame_count;			//フレーム数
 int distance;				//残り距離 
@@ -39,14 +40,18 @@ struct fps fps_counter;
 bool debug = false;			//デバックモード
 
 
-int leftUp_light_x, leftUp_light_y,		//クリア直前の光
-	rightUp_light_x, rightUp_light_y, 
+int leftUp_light_x,    leftUp_light_y,		//クリア直前の光
+	rightUp_light_x,   rightUp_light_y, 
 	rightDown_light_x, rightDown_light_y, 
-	leftDown_light_x, leftDown_light_y;
+	leftDown_light_x,  leftDown_light_y;
+
+int enemy_picture_leftUp_x,  enemy_picture_leftUp_y,
+	enemy_picture_rightUp_x, enemy_picture_rightUp_y;
 
 void Initialization( );
 void debugdraw( );
 void Action( );
+void FlashGraph( int x, int y, int handle );	//画像を点滅する関数
 
 void GameStart( );
 void GameMain( );
@@ -86,6 +91,7 @@ void Initialization( ) {
 
 	bright = 0;
 	bright_max = true;
+	//alpha = 255;
 
 	p_pos_index = 1;	//player.pre_pos[ 0 ]は最初の値を格納済み(player.pre_pos[ 0 ]を上書きしないため)
 	e_pos_index = 0;
@@ -103,6 +109,11 @@ void Initialization( ) {
 
 	whited = 255;
 	pushed = false;
+
+	enemy_picture_leftUp_x = SCREEN_WIDTH_CENTER;
+	enemy_picture_leftUp_y = SCREEN_HEIGHT_CENTER;
+	enemy_picture_rightUp_x = SCREEN_WIDTH_CENTER;
+	enemy_picture_rightUp_y = SCREEN_HEIGHT_CENTER;
 }
 
 
@@ -362,6 +373,23 @@ void Action( ) {
 }
 
 
+//--画像を点滅させる関数
+void FlashGraph( int x, int y, int handle ){
+	if ( bright > 255  ) {
+		bright_max = true;
+	} else if ( bright < 0 ) {
+		bright_max = false;
+	} 
+	if ( !bright_max ) {
+		bright += 5;
+	} else {
+		bright -= 5;
+	}
+	SetDrawBlendMode( DX_BLENDMODE_ALPHA, bright );
+	DrawGraph( x, y, handle, TRUE );
+	SetDrawBlendMode( DX_BLENDMODE_ALPHA, whited );
+};
+
 void GameStart( ) {
 	if ( !initialized ) {
 		Initialization( );
@@ -378,8 +406,12 @@ void GameStart( ) {
 	//-----------------------------------------------
 
 	//タイトル表示-------------------------------------------------------------------------------------------
-	DrawString( SCREEN_WIDTH_CENTER - 50, SCREEN_HEIGHT_CENTER - 50, "闇音", GetColor( whited, whited, whited ) );
-	DrawString( SCREEN_WIDTH_CENTER - 90, SCREEN_HEIGHT_CENTER, "PRESS BUTTON", GetColor( whited, whited, whited ) );
+	//DrawString( SCREEN_WIDTH_CENTER - 50, SCREEN_HEIGHT_CENTER - 50, "闇音", GetColor( whited, whited, whited ) );
+	DrawGraph( SCREEN_WIDTH_CENTER - 80, SCREEN_HEIGHT_CENTER - 100, resource[ 7 ], TRUE );
+	//DrawString( SCREEN_WIDTH_CENTER - 90, SCREEN_HEIGHT_CENTER, "PRESS BUTTON", GetColor( whited, whited, whited ) );
+	//DrawGraph( SCREEN_WIDTH_CENTER - 200, SCREEN_HEIGHT_CENTER, resource[ 6 ], TRUE );
+	//if ( !pushed )
+	FlashGraph( SCREEN_WIDTH_CENTER - 80, SCREEN_HEIGHT_CENTER + 100, resource[ 6 ] );	//座標は中央下に来るように調整
 	//-------------------------------------------------------------------------------------------------------
 
 	//キー受付-------------------------------------------------------------------------------------------------------------------------------------------
@@ -403,6 +435,9 @@ void GameStart( ) {
 			gamestatus = GAME_MAIN;
 			initialized = false;
 			sounded = false;		//GameResultにも使用するためfalseに戻す
+			bright = 0;				//GameMainにも使用するため初期化
+			bright_max = true;		//GameMainにも使用するため初期化
+			whited = 255;
 		}
 
 	}
@@ -598,12 +633,25 @@ void GameResult( ) {
 
 	} else {
 		//ゲームオーバー時
-		if ( gameover_wait_count < 120 ) gameover_wait_count++; //ゲームオーバーの間
+		if ( gameover_wait_count < 180 ) gameover_wait_count++; //ゲームオーバーの間
 
 		if ( gameover_wait_count >= 120 ) {
-			DrawString( SCREEN_WIDTH_CENTER - 50, SCREEN_HEIGHT_CENTER - 50, "ゲームオーバー！！！", GetColor( 255, 0, 0 ) );
-			DrawString( SCREEN_WIDTH_CENTER - 50, SCREEN_HEIGHT_CENTER, "PUSH SPACE", GetColor( 255, 255, 255 ) );
-			DrawGraph( 100, 110, resource[ 0 ], TRUE );
+			
+			DrawExtendGraph( enemy_picture_leftUp_x, enemy_picture_leftUp_y,enemy_picture_rightUp_x,enemy_picture_rightUp_y, resource[ 0 ], TRUE );
+
+			if ( enemy_picture_leftUp_x > 100  ) { 
+				enemy_picture_leftUp_x -= 40;
+				enemy_picture_leftUp_y -= 40;
+				enemy_picture_rightUp_x += 40;
+				enemy_picture_rightUp_y += 40;
+			}
+
+			//DrawString( SCREEN_WIDTH_CENTER - 50, SCREEN_HEIGHT_CENTER - 50, "ゲームオーバー！！！", GetColor( 255, 0, 0 ) );
+			DrawGraph( SCREEN_WIDTH_CENTER - 300, SCREEN_HEIGHT_CENTER - 40, resource[ 5 ], TRUE );
+			if ( gameover_wait_count >= 180 ) FlashGraph( SCREEN_WIDTH_CENTER - 200, SCREEN_HEIGHT_CENTER + 50, resource[ 6 ] );
+			//DrawGraph( SCREEN_WIDTH_CENTER - 200, SCREEN_HEIGHT_CENTER + 50, resource[ 6 ], TRUE );
+			//DrawString( SCREEN_WIDTH_CENTER - 50, SCREEN_HEIGHT_CENTER, "PUSH SPACE", GetColor( 255, 255, 255 ) );
+			
 
 			if ( !sounded ) {
 				Vsound( sound[ GAME_OVER ], 100 );

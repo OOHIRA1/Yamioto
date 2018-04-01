@@ -2,7 +2,7 @@
 
 const int KEY_MAX = 256;
 
-const int FIRST_DISTANCE = 100;	//player‚Æenemey‚Ì‰Šú‹——£
+const int FIRST_DISTANCE = 10;	//player‚Æenemey‚Ì‰Šú‹——£
 const int CLEAR = 1;			//•K—v³‰ğ”
 const int QUESTION_MAX = 20;	//Å‘å–â‘è”
 const int SCREEN_WIDTH = 1280;

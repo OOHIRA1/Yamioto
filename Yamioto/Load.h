@@ -42,6 +42,9 @@ void load_resource( ) {
 	resource[ 2 ] = LoadGraph( "Resource/GAME-CLEAR-.png" );
 	resource[ 3 ] = LoadGraph( "Resource/aka.png" );
 	resource[ 4 ] = LoadGraph( "Resource/cursor.png" );
+	resource[ 5 ] = LoadGraph( "Resource/GAME-OVER-.png" );
+	resource[ 6 ] = LoadGraph( "Resource/PUSH-BUTTON.png" );
+	resource[ 7 ] = LoadGraph( "Resource/yami.png" );
 }
 
 
