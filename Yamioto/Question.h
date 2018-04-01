@@ -261,18 +261,18 @@ void ChooseWay( ) {
 	//-----------------------------------------------------------
 
 	DrawFormatStringToHandle( QUESTION_POS_X, QUESTION_POS_Y, cr, font_handle, "道を選択してください。\n" );
-	DrawFormatStringToHandle( SCREEN_WIDTH_CENTER, SCREEN_HEIGHT_CENTER, cr, font_handle2, "←：X　　↑：Z　　→：V" );
-	if ( key[ KEY_INPUT_Z ] ) { 
+	DrawFormatStringToHandle( SCREEN_WIDTH_CENTER, SCREEN_HEIGHT_CENTER, cr, font_handle2, "左：←　　上：↑　　右：→" );
+	if ( key[ KEY_INPUT_UP ] ) { 
 		exercise_books_num = level[ 0 ];
 		way = STRAIGHT_WAY; 
 		chooseWayFlag = false;
 	}
-	else if ( key[ KEY_INPUT_X ] ) {
+	else if ( key[ KEY_INPUT_LEFT ] ) {
 		exercise_books_num = level[ 1 ];
 		way = LEFT_WAY;
 		chooseWayFlag = false;
 	}
-	else if ( key[ KEY_INPUT_V ] ) { 
+	else if ( key[ KEY_INPUT_RIGHT ] ) { 
 		exercise_books_num = level[ 2 ];
 		way = RIGHT_WAY;
 		chooseWayFlag = false;

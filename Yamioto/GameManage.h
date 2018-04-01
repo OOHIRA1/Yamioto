@@ -72,7 +72,7 @@ void Initialization( ) {
 	QuesitionInitialize( );
 	SetPlayerPosAndDir( player.position, VAdd( player.position, player.direction ) );
 	SetEnemySoundPos( enemy.position, sound[ ENEMY_VOICE ] );
-	SetRadius( 30, sound[ ENEMY_VOICE ] );
+	SetRadius( 60, sound[ ENEMY_VOICE ] );
 
 	flame_count = 0;
 	distance = FIRST_DISTANCE;
@@ -117,7 +117,10 @@ void debugdraw( ) {
 	for ( int i = 0; i < DIFFICULTYMAX; i++ ) {
 
 		for ( int j = 0; j < QUESTION_MAX; j++ ) {
-			DrawFormatString( 0 + ( i * 20 ), ( j * 20 ) + 40, 0xffffff, "%d", q_finished[ i ][ j ] );
+			int color = 0xffffff;
+			if ( q_finished[ i ][ j ] ) color = 0xffff00;
+			
+			DrawFormatString( 0 + ( i * 20 ), ( j * 20 ) + 40, color, "%d", q_finished[ i ][ j ] );
 		}
 
 	}
@@ -144,6 +147,9 @@ void debugdraw( ) {
 	//p_pos”z—ñ‚ð•`‰æ-------------------------------------------------------------------------------------------------------------------------------------
 	for ( int i = 0; i < PRE_POS_MAX_INDEX; i++ ) {
 		int color = 0xffffff;
+		if ( i == p_pos_index - 1 ) {
+			color = 0x0000ff;
+		}
 		if ( i == e_pos_index ) {
 			color = 0xff0000;
 		}
@@ -151,12 +157,12 @@ void debugdraw( ) {
 	}
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
 
-	//e_pos_index‚ð•`‰æ-------------------------------------
-	DrawFormatString( 200, 0, 0xffffff, "%d", e_pos_index );
-	//------------------------------------------------------
-
 	//enemy.position‚ð•`‰æ-----------------------------------------------------------------------------------------------------------------
-	DrawFormatString( 300, 0, 0xffffff, "enemy.position : ( %5.1f, %5.1f, %5.1f )", enemy.position.x, enemy.position.y, enemy.position.z );
+	DrawFormatString( 500, 0, 0xffffff, "enemy.position : ( %5.1f, %5.1f, %5.1f )", enemy.position.x, enemy.position.y, enemy.position.z );
+	//-------------------------------------------------------------------------------------------------------------------------------------
+
+	//player.position‚ð•`‰æ-----------------------------------------------------------------------------------------------------------------
+	DrawFormatString( 500, 20, 0xffffff, "player.position : ( %5.1f, %5.1f, %5.1f )", player.position.x, player.position.y, player.position.z );
 	//-------------------------------------------------------------------------------------------------------------------------------------
 }
 
@@ -193,13 +199,9 @@ void Action( ) {
 
 		
 		escape_count++;							//“¹‚ð‘I‚ñ‚Å‘–‚Á‚Ä‚¢‚éŠÔ
-		distance += escape_count % 21 / 20;		//‘–‚Á‚Ä‚¢‚é•ª‹——£‚ð‚Æ‚é
-
-		//player.position.z += escape_count % 21 / 20;
-		//SetPlayerPosAndDir( player.position, VAdd( player.position, player.direction ) );
 
 		//‘–‚èI‚¦‚½‚ç-----------------------------------------------------------------------------
-		if ( escape_count == 100 ) {
+		if ( escape_count == 200 ) {
 			Ssound( sound[ PLAYER_ASIOTO ] );													//‘«Õ‚ðŽ~‚ß‚é
 			Vsound( sound[ DOOR_GATYA ], 100 );
 			Psound( sound[ DOOR_GATYA ], NORMAL );												//ƒhƒA‚Ì‰¹‚ð–Â‚ç‚·
@@ -287,8 +289,6 @@ void Action( ) {
 		//-----------------------------------------------------
 			
 		escape_count++;
-		
-		distance += escape_count % 21 / 20;
 		
 		player.position.z += escape_count % 21 / 20;
 		SetPlayerPosAndDir( player.position, VAdd( player.position, player.direction ) );
@@ -383,6 +383,7 @@ void GameMain( ) {
 
 	//‹——£‚ªk‚Ü‚é-------------------------------------------------------------------
 	flame_count++;
+	distance = ( int )( ( player.position.z - enemy.position.z ) + fabs( player.position.x - enemy.position.x ) );	//ƒvƒŒƒCƒ„[‚ÆƒGƒlƒ~[‚Ì‹——£‚ÌŒvŽZ
 	if ( !answer || chooseWayFlag ) {	//–â‘è‚ð“š‚¦‚Ä‚¢‚È‚¢‚Æ‚« ‚Ü‚½‚Í@“¹‚ð‘I‚ñ‚Å‚¢‚È‚¢‚Æ‚«
 		float x_diff = player.pre_pos[ e_pos_index ].x - enemy.position.x;
 		
@@ -393,7 +394,6 @@ void GameMain( ) {
 
 		switch( player.not_answer_count ) {
 		case 0:
-			distance -= flame_count % 61 / 60;
 			if ( x_diff < 0 ) {
 				enemy.position.x -= flame_count % 61 / 60;
 			} else if ( x_diff > 0 ){
@@ -404,7 +404,6 @@ void GameMain( ) {
 			break;
 
 		case 1:
-			distance -= flame_count % 46 / 45;
 			if ( x_diff < 0 ) {
 				enemy.position.x -= flame_count % 46 / 45;
 			} else if ( x_diff > 0 ){
@@ -415,7 +414,6 @@ void GameMain( ) {
 			break;
 
 		default:
-			distance -= flame_count % 31 / 30;
 			if ( x_diff < 0 ) {
 				enemy.position.x -= flame_count % 31 / 30;
 			} else if ( x_diff > 0 ){

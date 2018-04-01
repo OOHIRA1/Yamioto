@@ -11,7 +11,7 @@
 
 int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdshow ) {
 	SetWindowText( "闇音" );
-	SetOneMeter( 1 );
+	SetOneMeter( 0.2 );
 	ChangeWindowMode( TRUE );
 	SetAlwaysRunFlag( TRUE );	//別のウィンドウに切り替えても処理が継続される関数
 	SetWindowSize( 1280, 720 );
