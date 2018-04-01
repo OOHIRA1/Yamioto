@@ -16,7 +16,6 @@ bool initialized = false;			//初期化を一回だけ行うため
 
 int bright;					//点滅の透明度
 bool bright_max;			//透明度が最大になったかどうか
-//int alpha;					//画像の透明度
 
 int flame_count;			//フレーム数
 int distance;				//残り距離 
@@ -27,7 +26,7 @@ int gameover_wait_count;	//ゲームオーバーの間
 int p_pos_index;			//playerが入れるpre_posの添字番号
 int e_pos_index;			//enemyが入れるpre_posの添字番号
 
-int whited;					//スタート画面の文字の白さ
+int alpha;					//画面上にある画像のアルファ値
 bool pushed;				//キーを押したかどうか
 
 struct fps {
@@ -52,6 +51,7 @@ void Initialization( );
 void debugdraw( );
 void Action( );
 void FlashGraph( int x, int y, int handle );	//画像を点滅する関数
+void FadeOut( );								//フェードアウトする関数
 
 void GameStart( );
 void GameMain( );
@@ -91,7 +91,6 @@ void Initialization( ) {
 
 	bright = 0;
 	bright_max = true;
-	//alpha = 255;
 
 	p_pos_index = 1;	//player.pre_pos[ 0 ]は最初の値を格納済み(player.pre_pos[ 0 ]を上書きしないため)
 	e_pos_index = 0;
@@ -107,7 +106,7 @@ void Initialization( ) {
 
 	sounded = false;
 
-	whited = 255;
+	alpha = 255;
 	pushed = false;
 
 	enemy_picture_leftUp_x = SCREEN_WIDTH_CENTER;
@@ -381,14 +380,22 @@ void FlashGraph( int x, int y, int handle ){
 		bright_max = false;
 	} 
 	if ( !bright_max ) {
-		bright += 5;
+		bright += 3;
 	} else {
-		bright -= 5;
+		bright -= 3;
 	}
 	SetDrawBlendMode( DX_BLENDMODE_ALPHA, bright );
 	DrawGraph( x, y, handle, TRUE );
-	SetDrawBlendMode( DX_BLENDMODE_ALPHA, whited );
+	SetDrawBlendMode( DX_BLENDMODE_ALPHA, 255 );
 };
+
+
+//--フェードアウトする関数(徐々にフェードアウトするため毎フレーム呼ぶ必要がある)
+void FadeOut( ) {
+	if ( alpha > 0 ) alpha -= 2;
+	if ( alpha < 0 ) alpha = 0;
+	SetDrawBlendMode( DX_BLENDMODE_ALPHA, alpha );
+}
 
 void GameStart( ) {
 	if ( !initialized ) {
@@ -406,12 +413,10 @@ void GameStart( ) {
 	//-----------------------------------------------
 
 	//タイトル表示-------------------------------------------------------------------------------------------
-	//DrawString( SCREEN_WIDTH_CENTER - 50, SCREEN_HEIGHT_CENTER - 50, "闇音", GetColor( whited, whited, whited ) );
-	DrawGraph( SCREEN_WIDTH_CENTER - 80, SCREEN_HEIGHT_CENTER - 100, resource[ 7 ], TRUE );
-	//DrawString( SCREEN_WIDTH_CENTER - 90, SCREEN_HEIGHT_CENTER, "PRESS BUTTON", GetColor( whited, whited, whited ) );
-	//DrawGraph( SCREEN_WIDTH_CENTER - 200, SCREEN_HEIGHT_CENTER, resource[ 6 ], TRUE );
-	//if ( !pushed )
-	FlashGraph( SCREEN_WIDTH_CENTER - 80, SCREEN_HEIGHT_CENTER + 100, resource[ 6 ] );	//座標は中央下に来るように調整
+	DrawGraph( SCREEN_WIDTH_CENTER - 148, SCREEN_HEIGHT_CENTER - 100, resource[ 7 ], TRUE );
+	if ( !pushed ) {
+		FlashGraph( SCREEN_WIDTH_CENTER - 80, SCREEN_HEIGHT_CENTER + 100, resource[ 6 ] );	//座標は中央下に来るように調整
+	}
 	//-------------------------------------------------------------------------------------------------------
 
 	//キー受付-------------------------------------------------------------------------------------------------------------------------------------------
@@ -426,18 +431,18 @@ void GameStart( ) {
 
 	//キー入力後の処理------------------
 	if ( pushed ) {
-		if ( whited > 0 ) whited -= 2;
-		if ( whited < 0 ) whited = 0;
-		
+		FadeOut( );
 
-		if ( whited <= 0 ) {
+		if ( alpha <= 0 ) {
 			Ssound( sound[ GAME_START_SE ] );
 			gamestatus = GAME_MAIN;
 			initialized = false;
-			sounded = false;		//GameResultにも使用するためfalseに戻す
+			sounded = false;		//GameResultにも使用するため初期化
+			alpha = 255;			//GameResultにも使用するため初期化
+			pushed = false;			//GameResultにも使用するため初期化
 			bright = 0;				//GameMainにも使用するため初期化
 			bright_max = true;		//GameMainにも使用するため初期化
-			whited = 255;
+			SetDrawBlendMode( DX_BLENDMODE_ALPHA, 255 );
 		}
 
 	}
@@ -608,7 +613,7 @@ void GameMain( ) {
 }
 
 void GameResult( ) {
-	//メインBGMと足音と敵の歌声を止める(あとで統一)
+	//メインBGMと足音と敵の歌声を止める-------
 	Ssound( sound[ GAME_MAIN_BGM ] );
 	Ssound( sound[ ENEMY_VOICE ] );
 	if ( Csound( sound[ PLAYER_ASIOTO ] ) ) {
@@ -616,27 +621,50 @@ void GameResult( ) {
 	}
 	//----------------------------------------
 
-	//リザルト描画-------------------------------------------------------------------------------------------------------------------------------------------------
-	if ( player.answer_count == CLEAR ) {	
-		//クリア時
-		DrawGraph( SCREEN_WIDTH_CENTER - 150, SCREEN_HEIGHT_CENTER - 40, resource[ 2 ], TRUE );
-		DrawString( SCREEN_WIDTH_CENTER - 50, SCREEN_HEIGHT_CENTER + 50, "PRESS BUTTON", GetColor( 255, 255, 255 ) );
+	
+	if ( player.answer_count == CLEAR ) {	//クリア時
+		//文字画像描画-----------------------------------------------------------------------------------------------------
+		DrawGraph( SCREEN_WIDTH_CENTER - 170, SCREEN_HEIGHT_CENTER - 45, resource[ 2 ], TRUE );	//中央に来るように座標を調整
+		//-----------------------------------------------------------------------------------------------------------------
+		
+		//音を鳴らす処理--------------------------
 		if ( !sounded ) {
+			Vsound( sound[ GAME_CLEAR ], 100 );
 			Psound( sound[ GAME_CLEAR ], BACK );
 			sounded = true;
 		}
+		//----------------------------------------
 
-		if ( key[ KEY_INPUT_RETURN ] == 1 || joypad[ INPUT_1 ] == 1 || joypad[ INPUT_2 ] == 1 || joypad[ INPUT_3 ] == 1 || joypad[ INPUT_4 ] == 1 ) {
-				Ssound( sound[ GAME_CLEAR ] );
-				gamestatus = GAME_START;
+		if ( !Csound( sound[ GAME_CLEAR ] ) ) {	//音が止まってから行う処理
+			//文字画像描画----------------------------------------------------------------------------------------------------
+			if ( !pushed ) {
+				FlashGraph( SCREEN_WIDTH_CENTER - 80, SCREEN_HEIGHT_CENTER + 100, resource[ 6 ] );	//座標は中央下に来るように調整
 			}
+			//----------------------------------------------------------------------------------------------------------------
 
-	} else {
-		//ゲームオーバー時
-		if ( gameover_wait_count < 180 ) gameover_wait_count++; //ゲームオーバーの間
+			//キー受付------------------------------------------------------------------------------------------------------------------------------------
+			if ( key[ KEY_INPUT_RETURN ] == 1 || joypad[ INPUT_1 ] == 1 || joypad[ INPUT_2 ] == 1 || joypad[ INPUT_3 ] == 1 || joypad[ INPUT_4 ] == 1 ) {
+					Vsound( sound[ GAME_START_SE ], 80 );
+					Psound( sound[ GAME_START_SE ], BACK );
+					pushed = true;
+			}
+			//---------------------------------------------------------------------------------------------------------------------------------------------
+
+			//キー入力後処理------------------
+			if ( pushed ) {
+				FadeOut( );
+				if ( alpha <= 0 ) {
+					gamestatus = GAME_START;
+				}
+			}
+			//--------------------------------
+		}
+
+	} else {								//ゲームオーバー時
+		if ( gameover_wait_count < 200 ) gameover_wait_count++; //ゲームオーバーの間
 
 		if ( gameover_wait_count >= 120 ) {
-			
+			//エネミーが近づく処理------------------------------------------------------------------------------------------------------------------
 			DrawExtendGraph( enemy_picture_leftUp_x, enemy_picture_leftUp_y,enemy_picture_rightUp_x,enemy_picture_rightUp_y, resource[ 0 ], TRUE );
 
 			if ( enemy_picture_leftUp_x > 100  ) { 
@@ -645,30 +673,43 @@ void GameResult( ) {
 				enemy_picture_rightUp_x += 40;
 				enemy_picture_rightUp_y += 40;
 			}
-
-			//DrawString( SCREEN_WIDTH_CENTER - 50, SCREEN_HEIGHT_CENTER - 50, "ゲームオーバー！！！", GetColor( 255, 0, 0 ) );
-			DrawGraph( SCREEN_WIDTH_CENTER - 300, SCREEN_HEIGHT_CENTER - 40, resource[ 5 ], TRUE );
-			if ( gameover_wait_count >= 180 ) FlashGraph( SCREEN_WIDTH_CENTER - 200, SCREEN_HEIGHT_CENTER + 50, resource[ 6 ] );
-			//DrawGraph( SCREEN_WIDTH_CENTER - 200, SCREEN_HEIGHT_CENTER + 50, resource[ 6 ], TRUE );
-			//DrawString( SCREEN_WIDTH_CENTER - 50, SCREEN_HEIGHT_CENTER, "PUSH SPACE", GetColor( 255, 255, 255 ) );
+			//---------------------------------------------------------------------------------------------------------------------------------------
 			
-
+			//音を鳴らす処理--------------------------
 			if ( !sounded ) {
 				Vsound( sound[ GAME_OVER ], 100 );
 				Psound( sound[ GAME_OVER ], BACK );
 				sounded = true;
 			}
-		
-			if ( key[ KEY_INPUT_RETURN ] == 1 || joypad[ INPUT_1 ] == 1 || joypad[ INPUT_2 ] == 1 || joypad[ INPUT_3 ] == 1 || joypad[ INPUT_4 ] == 1 ) {
-				Ssound( sound[ GAME_OVER ] );
-				gamestatus = GAME_START;
+			//----------------------------------------
+
+			if ( !Csound( sound[ GAME_OVER ] ) ) {	//音が止まってから行う処理
+				//文字画像描画-----------------------------------------------------------------------------------------------------------
+				DrawGraph( SCREEN_WIDTH_CENTER - 300, SCREEN_HEIGHT_CENTER - 40, resource[ 5 ], TRUE );
+				if ( !pushed ) {
+					FlashGraph( SCREEN_WIDTH_CENTER - 80, SCREEN_HEIGHT_CENTER + 200, resource[ 6 ] );	//座標は中央下に来るように調整
+				}
+				//-----------------------------------------------------------------------------------------------------------------------
+
+				//キー受付-------------------------------------------------------------------------------------------------------------------------------------
+				if ( key[ KEY_INPUT_RETURN ] == 1 || joypad[ INPUT_1 ] == 1 || joypad[ INPUT_2 ] == 1 || joypad[ INPUT_3 ] == 1 || joypad[ INPUT_4 ] == 1 ) {
+					Vsound( sound[ GAME_START_SE ], 80 );
+					Psound( sound[ GAME_START_SE ], BACK );
+					pushed = true;
+				}
+				//----------------------------------------------------------------------------------------------------------------------------------------------
+
+				//キー入力後処理------------------
+				if ( pushed ) {
+					FadeOut( );
+					if ( alpha <= 0 ) {
+						gamestatus = GAME_START;
+					}
+				}
+				//--------------------------------
 			}
 		}
-
-	}
-	//------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-
+	}	
 }
 
 

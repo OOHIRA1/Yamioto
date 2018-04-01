@@ -21,7 +21,6 @@ struct q_load q_load[ DIFFICULTYMAX ];
 void load_sound( ) {
 	SetCreate3DSoundFlag( TRUE );
 	sound[ ENEMY_VOICE ] = LoadSoundMem( "Sound/EnemyVoice.wav" );
-	//sound[ ENEMY_VOICE ] = LoadSoundMem( "Sound/asioto.wav" );
 	SetCreate3DSoundFlag( FALSE );
 
 	sound[ PLAYER_ASIOTO  ] = LoadSoundMem( "Sound/PlayerAsioto.wav" );
@@ -44,7 +43,7 @@ void load_resource( ) {
 	resource[ 4 ] = LoadGraph( "Resource/cursor.png" );
 	resource[ 5 ] = LoadGraph( "Resource/GAME-OVER-.png" );
 	resource[ 6 ] = LoadGraph( "Resource/PUSH-BUTTON.png" );
-	resource[ 7 ] = LoadGraph( "Resource/yami.png" );
+	resource[ 7 ] = LoadGraph( "Resource/yamioto.png" );
 }
 
 
