@@ -6,18 +6,27 @@
 */
 #include <stdio.h>
 
-int sound[ 20 ]; //音楽のハンドル
+int sound[ 20 ];	//音楽のハンドル
 int resource[ 10 ];	//画像のハンドル
 
 struct q_load {
-	FILE* fp;
-	char num[ 10 ];		//テキストファイルを見やすくするために書いた問題番号
-	char questionStatement[ 3 * QUESTION_MAX ][ QUESTION_ELEMENT ];
-	char choices[ 4 * QUESTION_MAX ][ CHOICES_ELEMENT ];
-	int answerNum[ QUESTION_MAX ];		//正解番号
+	FILE* fp;																//ファイル型ポインタ
+	char num[ 10 ];															//テキストファイルを見やすくするために書いた問題番号
+	char questionStatement[ 3 * QUESTION_MAX ][ QUESTION_ELEMENT ];			//問題文
+	char choices[ 4 * QUESTION_MAX ][ CHOICES_ELEMENT ];					//選択肢
+	int answerNum[ QUESTION_MAX ];											//正解番号
 };
-struct q_load q_load[ DIFFICULTYMAX ];
+struct q_load q_load[ DIFFICULTYMAX ];										//問題に関する構造体
 
+
+//関数原型宣言===================================================================
+void load_sound( );		//音データを読み込む関数
+void load_resource( );	//画像データを読み込む関数
+void load_question( );	//問題データを読み込む関数
+//===============================================================================
+
+
+//--音データを読み込む関数
 void load_sound( ) {
 	SetCreate3DSoundFlag( TRUE );
 	sound[ ENEMY_VOICE ] = LoadSoundMem( "Sound/EnemyVoice.wav" );
@@ -35,6 +44,8 @@ void load_sound( ) {
 	sound[ GAME_START_SE  ] = LoadSoundMem( "Sound/GameStartSE.wav" );
 } 
 
+
+//--画像データを読み込む関数
 void load_resource( ) {
 	resource[ 0 ] = LoadGraph( "Resource/gameover.png" );
 	resource[ 1 ] = LoadGraph( "Resource/hikari.png" );
@@ -47,6 +58,7 @@ void load_resource( ) {
 }
 
 
+//--問題データを読み込む関数
 void load_question( ) {
 	fopen_s( &q_load[ 0 ].fp, "QuestionEasy.txt", "r" );
 	fopen_s( &q_load[ 1 ].fp, "QuestionBasic.txt", "r" );
@@ -57,38 +69,27 @@ void load_question( ) {
 			DxLib_End( );
 		} else {
 			int x = 0;
-			int y = 1;
-			int z = 2;
-			int a = 0;
-			int b = 1;
-			int c = 2;
-			int d = 3;
-			int e = 0;
+			int y = 0;
+			int z = 0;
 			
 			while( fscanf_s( q_load[ i ].fp, "%s %s %s %s %s %s %s %s %d", 
 					q_load[ i ].num, 10,
-					q_load[ i ].questionStatement[ x ], QUESTION_ELEMENT, 
-					q_load[ i ].questionStatement[ y ], QUESTION_ELEMENT, 
-					q_load[ i ].questionStatement[ z ], QUESTION_ELEMENT, 
-					q_load[ i ].choices[ a ], CHOICES_ELEMENT, 
-					q_load[ i ].choices[ b ], CHOICES_ELEMENT, 
-					q_load[ i ].choices[ c ], CHOICES_ELEMENT, 
-					q_load[ i ].choices[ d ], CHOICES_ELEMENT, 
-					&q_load[ i ].answerNum[ e ] ) == 9 ) { 
-
+					q_load[ i ].questionStatement[ x     ], QUESTION_ELEMENT, 
+					q_load[ i ].questionStatement[ x + 1 ], QUESTION_ELEMENT, 
+					q_load[ i ].questionStatement[ x + 2 ], QUESTION_ELEMENT, 
+					q_load[ i ].choices[ y     ], CHOICES_ELEMENT, 
+					q_load[ i ].choices[ y + 1 ], CHOICES_ELEMENT, 
+					q_load[ i ].choices[ y + 2 ], CHOICES_ELEMENT, 
+					q_load[ i ].choices[ y + 3 ], CHOICES_ELEMENT, 
+					&q_load[ i ].answerNum[ z ] ) == 9 ) {
 				x += 3;
-				y += 3;
-				z += 3;
-				a += 4; 
-				b += 4; 
-				c += 4; 
-				d += 4;
-				e++;
-
+				y += 4;
+				z += 1;
 			}
 		}
 		fclose( q_load[ i ].fp );
 
+		//　'/'を取り除く処理------------------------------------------------------------------------------------
 		for ( int j = 0; j < 3 * QUESTION_MAX; j++ ) {
 			if ( q_load[ i ].questionStatement[ j ][ 0 ] == '/' ) {
 				q_load[ i ].questionStatement[ j ][ 0 ] = ' ';
@@ -100,5 +101,6 @@ void load_question( ) {
 				}
 			}
 		}
+		//---------------------------------------------------------------------------------------------------------
 	}
 }
