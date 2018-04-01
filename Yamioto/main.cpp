@@ -23,19 +23,20 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 
 	SetDrawScreen( DX_SCREEN_BACK );
 
-	//初期化
+	//データの読み込み------
 	load_sound( );
 	load_resource( );
 	load_question( );
+	//----------------------
 
 	while ( 1 ) {
 		if ( ScreenFlip( ) != 0 || ProcessMessage( ) != 0 || ClearDrawScreen( ) != 0 ) {
 			break;
 		}
 
-		updateDevice( );
+		updateDevice( );	//キー入力受付
 		
-		switch( gamestatus ) {
+		switch( gamestatus ) {	//シーン切り替え処理
 		case GAME_START :
 			GameStart( );
 			break;
@@ -47,8 +48,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 			break;
 		}
 
-		if (  key[ KEY_INPUT_ESCAPE ] > 1 ) {
-			Ssound( sound[ GAME_START_BGM ] );
+		if (  key[ KEY_INPUT_ESCAPE ] > 1 ) {	//escapeキーを押したら強制終了
 			break;
 		}
 	}
