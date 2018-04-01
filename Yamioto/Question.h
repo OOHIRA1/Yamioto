@@ -28,16 +28,18 @@ enum Way way;			//選んだ道
 int level[ WAY_MAX ];	//道選択時の難易度
 bool level_randamed;	//道選択時に各道にランダムで難易度を割り振ったかどうかのフラグ
 
-void QuesitionInitialize( );
-void Question( int, int );
-void Question1( int );
-void Question2( int );
-void Question3( int );
-void ChooseWay( );
 
-void changeColor( int selectedchoice, char* string, int color ) {
-	DrawFormatStringToHandle( CHOICES_POS_X, CHOICES_POS_Y + ( CURSOR_SELECT_POS_Y * selectedchoice ), color, font_handle2, string );
-}
+//関数原型宣言=====================
+void QuesitionInitialize( );			//Question.hの変数を初期化する関数
+void changeColor( int, char*, int );	//選択した問題文の色を変える関数
+void JoypadCursor( );					//カーソルを表示する関数(ジョイパット対応)
+void Question( int, int );				//難易度aの問題番号numを表示する関数
+void Question1( int );					//QuestionEasy.txtの問題を表示する関数
+void Question2( int );					//QuestionBasic.txtの問題を表示する関数
+void Question3( int );					//QuestionHard.txtの問題を表示する関数
+void ChooseWay( );						//道を選択する関数
+//=================================
+
 
 
 
@@ -70,6 +72,13 @@ void QuesitionInitialize( ) {
 	level_randamed = false;
 }
 
+
+//--選択した問題文の色を変える関数
+void changeColor( int selectedchoice, char* string, int color ) {
+	DrawFormatStringToHandle( CHOICES_POS_X, CHOICES_POS_Y + ( CURSOR_SELECT_POS_Y * selectedchoice ), color, font_handle2, string );
+}
+
+
 ////--カーソルを表示する関数(キーボード対応)
 //void KeybordCursor( ) {
 //	DrawCircle( CHOICES_POS_X - 20, CHOICES_POS_Y + 10 + ( CURSOR_SELECT_POS_Y * selectedSentence ), 5, cr, true );
@@ -83,6 +92,7 @@ void QuesitionInitialize( ) {
 //	}
 //}
 
+
 //--カーソルを表示する関数(ジョイパット対応)
 void JoypadCursor( ) { 
 	DrawCircle( CHOICES_POS_X - 20, CHOICES_POS_Y + 11 + ( CURSOR_SELECT_POS_Y * selectedSentence ), 5, cr, true );
@@ -92,11 +102,13 @@ void JoypadCursor( ) {
 		selectedSentence++;
 	}
 
-	if ( joypad[ UP ] == 1 && selectedSentence > 0 ) {	//一番下に来たらそれ以上進まない //選択肢が４つあるので4 - 1
+	if ( joypad[ UP ] == 1 && selectedSentence > 0 ) {	//一番上に来たらそれ以上進まない
 		selectedSentence--;
 	}
 }
 
+
+//--難易度aの問題番号numを表示する関数
 void Question( int a, int num ) {
 	switch( a ) {
 	case 0:
@@ -127,14 +139,14 @@ void Question1( int num ) {
 
 		if ( key[ KEY_INPUT_RETURN ] == 1 || joypad[ INPUT_2 ] == 1 ) {
 
-			if ( selectedSentence == q_load[ EASY ].answerNum[ num - 1 ] ) {
+			if ( selectedSentence == q_load[ EASY ].answerNum[ num - 1 ] ) {	//正解時
 
 				cr2 = GetColor( 0, 255, 0 );
 				changeColor( selectedSentence, q_load[ EASY ].choices[ selectedSentence + ( num - 1 ) * 4 ], cr2 );
 				answer = true;
 				input = false;
 
-			} else {
+			} else {	//不正解時
 
 				cr2 = GetColor( 255, 0, 0 );
 				changeColor( selectedSentence, q_load[ EASY ].choices[ selectedSentence + ( num - 1 ) * 4  ], cr2 );
@@ -164,14 +176,14 @@ void Question2( int num ) {
 
 		if ( key[ KEY_INPUT_RETURN ] == 1 || joypad[ INPUT_2 ] == 1 ) {
 
-			if ( selectedSentence == q_load[ BASIC ].answerNum[ num - 1 ] ) {
+			if ( selectedSentence == q_load[ BASIC ].answerNum[ num - 1 ] ) {	//正解時
 
 				cr2 = GetColor( 0, 255, 0 );
 				changeColor( selectedSentence, q_load[ BASIC ].choices[ selectedSentence + ( num - 1 ) * 4 ], cr2 );
 				answer = true;
 				input = false;
 
-			} else {
+			} else {	//不正解時
 
 				cr2 = GetColor( 255, 0, 0 );
 				changeColor( selectedSentence, q_load[ BASIC ].choices[ selectedSentence + ( num - 1 ) * 4  ], cr2 );
@@ -201,14 +213,14 @@ void Question3( int num ) {
 
 		if ( key[ KEY_INPUT_RETURN ] == 1 || joypad[ INPUT_2 ] == 1 ) {
 
-			if ( selectedSentence == q_load[ HARD ].answerNum[ num - 1 ] ) {
+			if ( selectedSentence == q_load[ HARD ].answerNum[ num - 1 ] ) {	//正解時
 
 				cr2 = GetColor( 0, 255, 0 );
 				changeColor( selectedSentence, q_load[ HARD ].choices[ selectedSentence + ( num - 1 ) * 4 ], cr2 );
 				answer = true;
 				input = false;
 
-			} else {
+			} else {	//不正解時
 
 				cr2 = GetColor( 255, 0, 0 );
 				changeColor( selectedSentence, q_load[ HARD ].choices[ selectedSentence + ( num - 1 ) * 4  ], cr2 );
@@ -235,9 +247,9 @@ void RandamQuestion( ) {
 //--道を選択する関数
 void ChooseWay( ) {
 
-	//それぞれの道に難易度を振り分ける------------------------
+	//それぞれの道に難易度を振り分ける----------------------------------------------------------------------
 	if ( !level_randamed ) {
-		bool a[ DIFFICULTYMAX ] = { false, false, false };
+		bool a[ DIFFICULTYMAX ] = { false, false, false };	//難易度を振り分けたどうかチェックしておく変数
 		int count = 0;
 		srand( ( unsigned int )time( NULL ) );
 
@@ -246,33 +258,33 @@ void ChooseWay( ) {
 			int difficulty = rand( ) % WAY_MAX;
 			level[ count ] = difficulty;
 
-			if ( !a[ difficulty ] ) { 
+			if ( !a[ difficulty ] ) { //難易度difficultyは振り分けたかチェック
 				a[ difficulty ] = true;
 				count++;
 			}
 
-			for ( int i = 0; i < WAY_MAX; i++ ) {
+			for ( int i = 0; i < WAY_MAX; i++ ) {	//全ての難易度を振り分けたかチェック
 				if ( a[ i ] == false ) break;
 				if ( i == WAY_MAX - 1 ) level_randamed = true;
 			}
 			if ( level_randamed ) break;
 		};
 	}
-	//-----------------------------------------------------------
+	//--------------------------------------------------------------------------------------------------------
 
 	DrawFormatStringToHandle( QUESTION_POS_X, QUESTION_POS_Y, cr, font_handle, "道を選択してください。\n" );
 	DrawFormatStringToHandle( SCREEN_WIDTH_CENTER, SCREEN_HEIGHT_CENTER, cr, font_handle2, "左：←　　上：↑　　右：→" );
-	if ( key[ KEY_INPUT_UP ] ) { 
+	if ( joypad[ UP ] ) { 
 		exercise_books_num = level[ 0 ];
 		way = STRAIGHT_WAY; 
 		chooseWayFlag = false;
 	}
-	else if ( key[ KEY_INPUT_LEFT ] ) {
+	else if ( joypad[ LEFT ] ) {
 		exercise_books_num = level[ 1 ];
 		way = LEFT_WAY;
 		chooseWayFlag = false;
 	}
-	else if ( key[ KEY_INPUT_RIGHT ] ) { 
+	else if ( joypad[ RIGHT ] ) { 
 		exercise_books_num = level[ 2 ];
 		way = RIGHT_WAY;
 		chooseWayFlag = false;
