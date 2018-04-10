@@ -219,13 +219,13 @@ void Action( ) {
 		case RIGHT_WAY:
 			player.position.x += escape_count % 21 / 20;
 			player.direction = VGet( 1, 0, 0 );
-			SetPlayerPosAndDir( player.position, VAdd( player.position, player.direction ) );
+			SetPlayerPosAndDir( player.position, player.direction );
 			break;
 
 		case LEFT_WAY:
 			player.position.x -= escape_count % 21 / 20;
 			player.direction = VGet( -1, 0, 0 );
-			SetPlayerPosAndDir( player.position, VAdd( player.position, player.direction ) );
+			SetPlayerPosAndDir( player.position, player.direction );
 			break;
 		}
 		//-------------------------------------------------------------------------------------
@@ -239,7 +239,7 @@ void Action( ) {
 			escape_count = 0;																	//カウントをリセット
 
 			player.direction = VGet( 0, 0, 1 );													//プレイヤーの向きを前にする
-			SetPlayerPosAndDir( player.position, VAdd( player.position, player.direction ) );
+			SetPlayerPosAndDir( player.position, player.direction );
 
 			input = true;																		//入力を受け付ける
 
@@ -320,7 +320,7 @@ void Action( ) {
 		escape_count++;
 		
 		player.position.z += escape_count % 21 / 20;
-		SetPlayerPosAndDir( player.position, VAdd( player.position, player.direction ) );
+		SetPlayerPosAndDir( player.position, player.direction );
 		
 
 		//脱出直前の画像表示---------------------------------------------------------------------------------------------------------------------
@@ -695,7 +695,7 @@ void GameResult( ) {
 			
 			//音を鳴らす処理--------------------------
 			if ( !sounded ) {
-				Vsound( sound[ GAME_OVER ], 100 );
+				Vsound( sound[ GAME_OVER ], 200 );
 				Psound( sound[ GAME_OVER ], BACK );
 				sounded = true;
 			}
